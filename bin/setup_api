@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# Script de configuración para Koffy API
+
+set -e
+
+echo "🚀 Configurando Koffy API..."
+echo ""
+
+# Check if PostgreSQL is running
+echo "📊 Verificando PostgreSQL..."
+if ! pg_isready -q; then
+  echo "⚠️  PostgreSQL no está corriendo."
+  echo "   Ejecuta: sudo service postgresql start"
+  exit 1
+fi
+
+echo "✅ PostgreSQL está corriendo"
+echo ""
+
+# Check for .env file
+if [ ! -f .env ]; then
+  echo "⚠️  No se encontró archivo .env"
+  echo "   Por favor crea un archivo .env con GOOGLE_CLIENT_ID"
+  echo "   Puedes usar env.example.txt como referencia"
+  exit 1
+fi
+
+# Check for GOOGLE_CLIENT_ID
+if ! grep -q "GOOGLE_CLIENT_ID=" .env || grep -q "GOOGLE_CLIENT_ID=your_google_client_id_here" .env; then
+  echo "⚠️  GOOGLE_CLIENT_ID no está configurado en .env"
+  echo "   Por favor agrega tu Google Client ID al archivo .env"
+  echo "   Obtén uno en: https://console.cloud.google.com"
+  echo ""
+  echo "   El archivo .env debería tener algo como:"
+  echo "   GOOGLE_CLIENT_ID=123456789-abc.apps.googleusercontent.com"
+  exit 1
+fi
+
+echo "✅ Variables de entorno configuradas"
+echo ""
+
+# Create database
+echo "🗄️  Creando base de datos..."
+if rails db:create; then
+  echo "✅ Base de datos creada"
+else
+  echo "⚠️  La base de datos puede ya existir, continuando..."
+fi
+echo ""
+
+# Run migrations
+echo "🔄 Ejecutando migraciones..."
+rails db:migrate
+echo "✅ Migraciones completadas"
+echo ""
+
+# Seed database
+echo "🌱 Cargando datos iniciales..."
+rails db:seed
+echo "✅ Datos cargados"
+echo ""
+
+echo "🎉 ¡Configuración completada!"
+echo ""
+echo "📝 Credenciales de Admin:"
+echo "   Email: admin@example.com"
+echo "   Password: password"
+echo "   Panel: http://localhost:3000/admin"
+echo ""
+echo "🚀 Inicia el servidor con:"
+echo "   rails server"
+echo ""
+
