@@ -19,8 +19,12 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    # Stub the validator creation using Minitest's stub method
-    GoogleIDToken::Validator.stub :new, validator_mock do
+    # Temporarily replace the new method to return our mock
+    # Store the original method
+    original_new = GoogleIDToken::Validator.method(:new)
+    GoogleIDToken::Validator.define_singleton_method(:new) { |*args| validator_mock }
+
+    begin
       # Make POST request with id_token parameter
       post auth_google_url, params: { id_token: "fake_google_id_token" }, as: :json
 
@@ -41,6 +45,9 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
       assert_not_nil user
       assert_equal "google", user.provider
       assert_equal "google_user_123", user.uid
+    ensure
+      # Restore the original method
+      GoogleIDToken::Validator.define_singleton_method(:new, &original_new)
     end
   end
 
@@ -65,8 +72,12 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
       nil
     end
 
-    # Stub the validator creation
-    GoogleIDToken::Validator.stub :new, validator_mock do
+    # Temporarily replace the new method to return our mock
+    # Store the original method
+    original_new = GoogleIDToken::Validator.method(:new)
+    GoogleIDToken::Validator.define_singleton_method(:new) { |*args| validator_mock }
+
+    begin
       # Make POST request with invalid id_token
       post auth_google_url, params: { id_token: "invalid_token" }, as: :json
 
@@ -78,6 +89,9 @@ class AuthControllerTest < ActionDispatch::IntegrationTest
 
       # Assert error message
       assert_equal "Invalid Google token", json_response["error"]
+    ensure
+      # Restore the original method
+      GoogleIDToken::Validator.define_singleton_method(:new, &original_new)
     end
   end
 end
