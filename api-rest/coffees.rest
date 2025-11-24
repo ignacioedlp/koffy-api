@@ -250,7 +250,6 @@ Authorization: Bearer {{token}}
 ### - process_method: String - Processing method
 ### - roast_level: String - Roast level
 ### - flavor_notes: String - Tasting notes
-### - image_url: String - URL to coffee image
 ### - is_active: Boolean - Whether the coffee is visible to public
 ### - featured: Boolean - Whether to highlight this coffee
 ### - category_ids: Array - IDs of categories this coffee belongs to

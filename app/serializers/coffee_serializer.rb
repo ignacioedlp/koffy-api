@@ -6,7 +6,7 @@ class CoffeeSerializer
   # ========================================
   # Information that customers need to browse and choose coffees
   attributes :id, :name, :description, :origin_country, :varietal, 
-             :process_method, :roast_level, :flavor_notes, :image_url,
+             :process_method, :roast_level, :flavor_notes,
              :featured, :created_at, :updated_at
   
   # Roaster information (public)
@@ -35,6 +35,15 @@ class CoffeeSerializer
   # Category names for easy filtering
   attribute :categories do |coffee|
     coffee.categories.active.map { |cat| { id: cat.id, name: cat.name, color: cat.color } }
+  end
+  
+  # Images URLs (public)
+  attribute :images do |coffee|
+    if coffee.images.attached?
+      coffee.images.map { |image| Rails.application.routes.url_helpers.url_for(image) }
+    else
+      []
+    end
   end
   
   # ========================================

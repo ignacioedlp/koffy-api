@@ -160,9 +160,9 @@ class CoffeesController < ApplicationController
       :process_method, 
       :roast_level, 
       :flavor_notes, 
-      :image_url,
       :is_active,
       :featured,
+      images: [],
       category_ids: []
     )
   end

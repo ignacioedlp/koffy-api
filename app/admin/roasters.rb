@@ -1,11 +1,28 @@
 ActiveAdmin.register Roaster do
   # Permit parameters for create/update
-  permit_params :name, :location, :description, :active, :delivery_available
+  permit_params :name, :location, :description, :active, :delivery_available, :logo
+  
+  # Member action to remove logo
+  member_action :remove_logo, method: :delete do
+    if resource.logo.attached?
+      resource.logo.purge
+      redirect_to admin_roaster_path(resource), notice: "Logo removed successfully"
+    else
+      redirect_to admin_roaster_path(resource), alert: "No logo found"
+    end
+  end
   
   # Index page configuration
   index do
     selectable_column
     id_column
+    column :logo do |roaster|
+      if roaster.logo.attached?
+        image_tag url_for(roaster.logo), size: "80x80"
+      else
+        'No logo'
+      end
+    end
     column :name
     column :location
     column :active do |roaster|
@@ -40,6 +57,13 @@ ActiveAdmin.register Roaster do
     attributes_table do
       row :id
       row :name
+      row :logo do |roaster|
+        if roaster.logo.attached?
+          image_tag url_for(roaster.logo), size: "150x150"
+        else
+          'No logo'
+        end
+      end
       row :location
       row :description
       row :active do |roaster|
@@ -138,6 +162,23 @@ ActiveAdmin.register Roaster do
       f.input :description, as: :text
       f.input :active
       f.input :delivery_available
+      f.input :logo, as: :file, hint: "Upload a logo for the roaster"
+      
+      # Show current logo if editing
+      if f.object.logo.attached?
+        f.inputs "Current Logo" do
+          li do
+            content_tag :div, style: "margin: 10px 0; padding: 10px; border: 1px solid #ddd; display: inline-block;" do
+              image_tag(url_for(f.object.logo), size: "150x150") +
+              content_tag(:br) +
+              link_to("Remove Logo", remove_logo_admin_roaster_path(f.object), 
+                      method: :delete, 
+                      data: { confirm: "Are you sure you want to remove this logo?" },
+                      style: "color: red;")
+            end
+          end
+        end
+      end
     end
     f.actions
   end

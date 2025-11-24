@@ -6,6 +6,9 @@ class Coffee < ApplicationRecord
   has_many :coffee_variants, dependent: :destroy
   
   has_many :coffee_categories, dependent: :destroy
+
+  has_many_attached :images
+
   has_many :categories, through: :coffee_categories
   
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
@@ -21,10 +24,17 @@ class Coffee < ApplicationRecord
   validates :roast_level, length: { maximum: 50 }, allow_blank: true
   
   validates :flavor_notes, length: { maximum: 500 }, allow_blank: true
-  
-  validates :image_url, length: { maximum: 500 }, allow_blank: true
-  
+    
   validates :is_active, inclusion: { in: [true, false] }
+  
+  # Custom validation to limit images to maximum 3
+  validate :validate_images_count
+  
+  def validate_images_count
+    if images.attached? && images.count > 3
+      errors.add(:images, "can't have more than 3 images")
+    end
+  end
   
   scope :active, -> { where(is_active: true) }
   
