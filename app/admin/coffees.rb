@@ -2,8 +2,21 @@ ActiveAdmin.register Coffee do
   menu parent: 'Roasters', priority: 2
   
   permit_params :roaster_id, :name, :description, :origin_country, :varietal, 
-                :process_method, :roast_level, :flavor_notes, :image_url, 
-                :is_active, :featured, category_ids: []
+                :process_method, :roast_level, :flavor_notes,
+                :is_active, :featured, images: [], category_ids: []
+  
+  # Member action to remove a specific image
+  member_action :remove_image, method: :delete do
+    blob = ActiveStorage::Blob.find_signed(params[:image_id])
+    attachment = resource.images.find_by(blob_id: blob.id)
+    
+    if attachment
+      attachment.purge
+      redirect_to admin_coffee_path(resource), notice: "Image removed successfully"
+    else
+      redirect_to admin_coffee_path(resource), alert: "Image not found"
+    end
+  end
   
   index do
     selectable_column
@@ -13,6 +26,18 @@ ActiveAdmin.register Coffee do
       link_to coffee.roaster.name, admin_roaster_path(coffee.roaster)
     end
     
+    column :images do |coffee|
+      if coffee.images.attached?
+        # Show first image in index, or count if multiple
+        if coffee.images.count > 1
+          image_tag url_for(coffee.images.first), size: "80x80", title: "#{coffee.images.count} images"
+        else
+          image_tag url_for(coffee.images.first), size: "80x80"
+        end
+      else
+        'No images'
+      end
+    end
     column :name
     column :origin_country
     column :roast_level
@@ -53,6 +78,20 @@ ActiveAdmin.register Coffee do
       row :roaster do |coffee|
         link_to coffee.roaster.name, admin_roaster_path(coffee.roaster)
       end
+
+      row :images do |coffee|
+        if coffee.images.attached?
+          div do
+            coffee.images.each do |image|
+              div style: "display: inline-block; margin: 10px;" do
+                image_tag url_for(image), size: "200x200"
+              end
+            end
+          end
+        else
+          'No images'
+        end
+      end
       
       row :name
       row :description
@@ -61,14 +100,6 @@ ActiveAdmin.register Coffee do
       row :process_method
       row :roast_level
       row :flavor_notes
-      
-      row :image_url do |coffee|
-        if coffee.image_url.present?
-          link_to coffee.image_url, coffee.image_url, target: '_blank'
-        else
-          'No image'
-        end
-      end
       
       row :is_active do |coffee|
         status_tag coffee.is_active ? 'Active' : 'Inactive', class: coffee.is_active ? 'yes' : 'no'
@@ -175,7 +206,27 @@ ActiveAdmin.register Coffee do
               hint: "Degree of roasting applied to the beans"
       f.input :flavor_notes, as: :text, input_html: { rows: 3 }, 
               hint: "Comma-separated flavor notes (e.g., chocolate, caramel, fruity)"
-      f.input :image_url, label: "Image URL"
+
+      f.input :images, as: :file, input_html: { multiple: true }, 
+              hint: "Upload up to 3 images for the coffee"
+      
+      # Show existing images if editing
+      if f.object.images.attached?
+        f.inputs "Current Images (#{f.object.images.count}/3)" do
+          f.object.images.each_with_index do |image, index|
+            li do
+              content_tag :div, style: "margin: 10px 0; padding: 10px; border: 1px solid #ddd; display: inline-block;" do
+                image_tag(url_for(image), size: "150x150") +
+                content_tag(:br) +
+                link_to("Remove", remove_image_admin_coffee_path(f.object, image_id: image.signed_id), 
+                        method: :delete, 
+                        data: { confirm: "Are you sure you want to remove this image?" },
+                        style: "color: red;")
+              end
+            end
+          end
+        end
+      end
     end
     
     f.inputs "Categories" do

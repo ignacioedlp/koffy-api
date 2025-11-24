@@ -4,7 +4,6 @@ class CreateRoasters < ActiveRecord::Migration[7.2]
       t.string :name, null: false
       t.string :location
       t.text :description
-      t.text :logo_url
       t.numeric :average_rating, default: 0, null: false
       t.boolean :delivery_available, default: false, null: false
       t.boolean :active, default: true, null: false

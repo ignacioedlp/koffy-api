@@ -15,11 +15,12 @@ class Roaster < ApplicationRecord
   # A roaster has many custom categories
   has_many :categories, dependent: :destroy
   
+  has_one_attached :logo
+  
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
   validates :location, length: { maximum: 200 }, allow_blank: true
   validates :description, length: { maximum: 1000 }, allow_blank: true
-  validates :logo_url, length: { maximum: 200 }, allow_blank: true
   validates :average_rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 5 }, allow_blank: true
   validates :delivery_available, inclusion: { in: [true, false] }
   

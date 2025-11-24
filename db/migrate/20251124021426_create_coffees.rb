@@ -11,9 +11,7 @@ class CreateCoffees < ActiveRecord::Migration[7.2]
       t.string :process_method, limit: 50
       t.string :roast_level, limit: 50
       t.text :flavor_notes
-      
-      t.text :image_url
-      
+            
       t.boolean :is_active, default: true, null: false
       
       t.timestamps
