@@ -18,6 +18,9 @@ class Roaster < ApplicationRecord
   # A roaster has many orders (as a seller)
   has_many :orders, dependent: :destroy
   
+  # A roaster has many reviews (reviews from users)
+  has_many :reviews, dependent: :destroy
+  
   has_one_attached :logo
   
   # Validations

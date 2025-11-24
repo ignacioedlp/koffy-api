@@ -19,6 +19,8 @@ Rails.application.routes.draw do
       resources :variants, only: [:create], controller: 'coffee_variants'
     end
     resources :categories, only: [:index, :show, :create, :update, :destroy]
+    # Nested routes: reviews for a specific roaster
+    resources :reviews, only: [:index], controller: 'reviews'
   end
   
   # Coffees routes (public index and show only)
@@ -30,6 +32,11 @@ Rails.application.routes.draw do
       post 'scan_qr', to: 'orders#scan_qr'
     end
   end
+
+  # Reviews routes
+  # Public routes: index (anyone can view reviews)
+  # Authenticated routes: create, update, destroy (only authenticated users)
+  resources :reviews, only: [:index, :show, :create, :update, :destroy]
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
