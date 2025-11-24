@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_24_164736) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_25_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -124,6 +124,30 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_24_164736) do
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
   end
 
+  create_table "order_items", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "coffee_variant_id", null: false
+    t.integer "quantity"
+    t.decimal "unit_price", precision: 10, scale: 2
+    t.index ["coffee_variant_id"], name: "index_order_items_on_coffee_variant_id"
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "roaster_id", null: false
+    t.string "status", limit: 30, default: "pending", null: false
+    t.decimal "total_amount", precision: 10, scale: 2
+    t.string "pickup_or_delivery", limit: 20
+    t.text "qr_code_data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_orders_on_created_at"
+    t.index ["roaster_id"], name: "index_orders_on_roaster_id"
+    t.index ["status"], name: "index_orders_on_status"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
   create_table "roaster_memberships", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "roaster_id", null: false
@@ -205,6 +229,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_24_164736) do
   add_foreign_key "coffee_categories", "coffees"
   add_foreign_key "coffee_variants", "coffees"
   add_foreign_key "coffees", "roasters"
+  add_foreign_key "order_items", "coffee_variants"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "orders", "roasters"
+  add_foreign_key "orders", "users"
   add_foreign_key "roaster_memberships", "roasters"
   add_foreign_key "roaster_memberships", "users"
 end
