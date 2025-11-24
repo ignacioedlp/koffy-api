@@ -1,42 +1,42 @@
 Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
-  
+
   # Devise routes for users with custom invitations controller
   devise_for :users, controllers: {
-    invitations: 'invitations'
+    invitations: "invitations"
   }
-  
+
   # Custom authentication routes
-  post 'auth/google', to: 'auth#google'
-  post 'login', to: 'auth#login'
-  delete 'logout', to: 'auth#logout'
-  
+  post "auth/google", to: "auth#google"
+  post "login", to: "auth#login"
+  delete "logout", to: "auth#logout"
+
   # Roasters routes
   resources :roasters do
-    resources :members, only: [:index, :create, :update, :destroy], controller: 'roaster_members'
-    resources :coffees, only: [:create, :update, :destroy] do
-      resources :variants, only: [:create], controller: 'coffee_variants'
+    resources :members, only: [ :index, :create, :update, :destroy ], controller: "roaster_members"
+    resources :coffees, only: [ :create, :update, :destroy ] do
+      resources :variants, only: [ :create ], controller: "coffee_variants"
     end
-    resources :categories, only: [:index, :show, :create, :update, :destroy]
+    resources :categories, only: [ :index, :show, :create, :update, :destroy ]
     # Nested routes: reviews for a specific roaster
-    resources :reviews, only: [:index], controller: 'reviews'
+    resources :reviews, only: [ :index ], controller: "reviews"
   end
-  
+
   # Coffees routes (public index and show only)
-  resources :coffees, only: [:index, :show]
+  resources :coffees, only: [ :index, :show ]
 
   # Orders routes (authenticated users only)
-  resources :orders, only: [:index, :show, :create, :update] do
+  resources :orders, only: [ :index, :show, :create, :update ] do
     collection do
-      post 'scan_qr', to: 'orders#scan_qr'
+      post "scan_qr", to: "orders#scan_qr"
     end
   end
 
   # Reviews routes
   # Public routes: index (anyone can view reviews)
   # Authenticated routes: create, update, destroy (only authenticated users)
-  resources :reviews, only: [:index, :show, :create, :update, :destroy]
+  resources :reviews, only: [ :index, :show, :create, :update, :destroy ]
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

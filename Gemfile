@@ -46,6 +46,7 @@ gem "kaminari"  # Pagination for API endpoints
 
 # Admin panel
 gem "activeadmin"
+gem "formadmin"
 
 # ActiveAdmin dependencies
 gem "inherited_resources"
@@ -65,5 +66,3 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 end
-
-

@@ -28,9 +28,9 @@ module KoffyApi
     # ActiveAdmin requires full Rails functionality (views, helpers, sessions)
     # The API endpoints still work perfectly with this configuration
     config.api_only = false
-    
+
     # Ensure asset pipeline is enabled for ActiveAdmin
     config.assets.enabled = true
-    config.assets.precompile += ['active_admin.css', 'active_admin.js']
+    config.assets.precompile += [ "active_admin.css", "active_admin.js" ]
   end
 end

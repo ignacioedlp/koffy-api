@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Concern para hacer modelos "searchables" en ActiveAdmin
-# 
+#
 # Este módulo automáticamente permite buscar en todos los atributos
 # EXCEPTO los sensibles (contraseñas, tokens, etc.)
 #
@@ -13,7 +13,7 @@
 # Si necesitas personalizar qué atributos son buscables:
 #   class User < ApplicationRecord
 #     include Ransackable
-#     
+#
 #     def self.custom_ransackable_attributes
 #       %w[name email custom_field]
 #     end
@@ -57,4 +57,3 @@ module Ransackable
     end
   end
 end
-

@@ -1,12 +1,12 @@
 class CoffeeVariantSerializer
   include JSONAPI::Serializer
-  
+
   # ========================================
   # PUBLIC INFORMATION (all can see)
   # ========================================
   # Information that customers need to make purchase decisions
   attributes :id, :grind_type, :bag_size, :price, :created_at, :updated_at
-  
+
   # ========================================
   # STOCK INFORMATION
   # ========================================
@@ -14,7 +14,7 @@ class CoffeeVariantSerializer
   attribute :available do |variant|
     variant.available?
   end
-  
+
   # ========================================
   # PRIVILEGED INFORMATION (only roaster members)
   # ========================================
@@ -24,10 +24,9 @@ class CoffeeVariantSerializer
   } do |variant|
     variant.stock
   end
-  
+
   # Full name for display purposes
   attribute :full_name do |variant|
     variant.full_name
   end
 end
-

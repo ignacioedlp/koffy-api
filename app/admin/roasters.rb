@@ -1,7 +1,7 @@
 ActiveAdmin.register Roaster do
   # Permit parameters for create/update
   permit_params :name, :location, :description, :active, :delivery_available, :logo
-  
+
   # Member action to remove logo
   member_action :remove_logo, method: :delete do
     if resource.logo.attached?
@@ -11,7 +11,7 @@ ActiveAdmin.register Roaster do
       redirect_to admin_roaster_path(resource), alert: "No logo found"
     end
   end
-  
+
   # Index page configuration
   index do
     selectable_column
@@ -20,16 +20,16 @@ ActiveAdmin.register Roaster do
       if roaster.logo.attached?
         image_tag url_for(roaster.logo), size: "80x80"
       else
-        'No logo'
+        "No logo"
       end
     end
     column :name
     column :location
     column :active do |roaster|
-      status_tag roaster.active ? 'Active' : 'Inactive', class: roaster.active ? 'yes' : 'no'
+      status_tag roaster.active ? "Active" : "Inactive", class: roaster.active ? "yes" : "no"
     end
     column :delivery_available do |roaster|
-      status_tag roaster.delivery_available ? 'Available' : 'Not Available', class: roaster.delivery_available ? 'yes' : 'no'
+      status_tag roaster.delivery_available ? "Available" : "Not Available", class: roaster.delivery_available ? "yes" : "no"
     end
     column :average_rating do |roaster|
       roaster.average_rating
@@ -43,7 +43,7 @@ ActiveAdmin.register Roaster do
     column :created_at
     actions
   end
-  
+
   # Filters for the index page
   filter :name
   filter :location
@@ -51,7 +51,7 @@ ActiveAdmin.register Roaster do
   filter :created_at
   filter :delivery_available
   filter :average_rating
-  
+
   # Show page configuration
   show do
     attributes_table do
@@ -61,16 +61,16 @@ ActiveAdmin.register Roaster do
         if roaster.logo.attached?
           image_tag url_for(roaster.logo), size: "150x150"
         else
-          'No logo'
+          "No logo"
         end
       end
       row :location
       row :description
       row :active do |roaster|
-        status_tag roaster.active ? 'Active' : 'Inactive', class: roaster.active ? 'yes' : 'no'
+        status_tag roaster.active ? "Active" : "Inactive", class: roaster.active ? "yes" : "no"
       end
       row :delivery_available do |roaster|
-        status_tag roaster.delivery_available ? 'Available' : 'Not Available', class: roaster.delivery_available ? 'yes' : 'no'
+        status_tag roaster.delivery_available ? "Available" : "Not Available", class: roaster.delivery_available ? "yes" : "no"
       end
       row :average_rating do |roaster|
         roaster.average_rating
@@ -78,7 +78,7 @@ ActiveAdmin.register Roaster do
       row :created_at
       row :updated_at
     end
-    
+
     panel "Members" do
       table_for roaster.roaster_memberships.includes(:user).active do
         column "User" do |membership|
@@ -92,7 +92,7 @@ ActiveAdmin.register Roaster do
         end
       end
     end
-    
+
     panel "Coffees" do
       if roaster.coffees.any?
         table_for roaster.coffees.order(created_at: :desc).limit(10) do
@@ -102,7 +102,7 @@ ActiveAdmin.register Roaster do
           column :origin_country
           column :roast_level
           column :is_active do |coffee|
-            status_tag coffee.is_active ? 'Active' : 'Inactive'
+            status_tag coffee.is_active ? "Active" : "Inactive"
           end
           column :total_stock do |coffee|
             coffee.total_stock
@@ -114,11 +114,11 @@ ActiveAdmin.register Roaster do
       else
         para "No coffees added yet."
         div do
-          link_to "Add First Coffee", new_admin_coffee_path(coffee: { roaster_id: roaster.id }), class: 'button'
+          link_to "Add First Coffee", new_admin_coffee_path(coffee: { roaster_id: roaster.id }), class: "button"
         end
       end
     end
-    
+
     panel "Categories" do
       if roaster.categories.any?
         table_for roaster.categories.order(position: :asc) do
@@ -131,12 +131,12 @@ ActiveAdmin.register Roaster do
                 category.color
               end
             else
-              'No color'
+              "No color"
             end
           end
           column :position
           column :is_active do |category|
-            status_tag category.is_active ? 'Active' : 'Inactive'
+            status_tag category.is_active ? "Active" : "Inactive"
           end
           column :coffees_count do |category|
             category.coffees.count
@@ -148,12 +148,12 @@ ActiveAdmin.register Roaster do
       else
         para "No categories created yet."
         div do
-          link_to "Add First Category", new_admin_category_path(category: { roaster_id: roaster.id }), class: 'button'
+          link_to "Add First Category", new_admin_category_path(category: { roaster_id: roaster.id }), class: "button"
         end
       end
     end
   end
-  
+
   # Form configuration
   form do |f|
     f.inputs "Roaster Details" do
@@ -163,7 +163,7 @@ ActiveAdmin.register Roaster do
       f.input :active
       f.input :delivery_available
       f.input :logo, as: :file, hint: "Upload a logo for the roaster"
-      
+
       # Show current logo if editing
       if f.object.logo.attached?
         f.inputs "Current Logo" do
@@ -171,8 +171,8 @@ ActiveAdmin.register Roaster do
             content_tag :div, style: "margin: 10px 0; padding: 10px; border: 1px solid #ddd; display: inline-block;" do
               image_tag(url_for(f.object.logo), size: "150x150") +
               content_tag(:br) +
-              link_to("Remove Logo", remove_logo_admin_roaster_path(f.object), 
-                      method: :delete, 
+              link_to("Remove Logo", remove_logo_admin_roaster_path(f.object),
+                      method: :delete,
                       data: { confirm: "Are you sure you want to remove this logo?" },
                       style: "color: red;")
             end

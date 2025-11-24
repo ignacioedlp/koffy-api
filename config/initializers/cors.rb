@@ -9,12 +9,12 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # In production, replace '*' with your actual frontend domain
     # Example: origins 'https://yourdomain.com', 'http://localhost:3001'
-    origins '*'
+    origins "*"
 
     resource "*",
       headers: :any,
-      expose: ['Authorization'],  # Expose JWT token header
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      expose: [ "Authorization" ],  # Expose JWT token header
+      methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
       credentials: false
   end
 end

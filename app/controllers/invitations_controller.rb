@@ -3,8 +3,8 @@
 # necesitamos nuestro propio controlador que responda con JSON
 class InvitationsController < Devise::InvitationsController
   # Aseguramos que el usuario esté autenticado para enviar invitaciones
-  before_action :authenticate_user!, only: [:create]
-  
+  before_action :authenticate_user!, only: [ :create ]
+
   # Configuramos respuestas en formato JSON
   respond_to :json
 
@@ -21,7 +21,7 @@ class InvitationsController < Devise::InvitationsController
     if resource.errors.empty?
       # La invitación se envió exitosamente
       render json: {
-        message: 'Invitación enviada exitosamente',
+        message: "Invitación enviada exitosamente",
         user: {
           id: resource.id,
           email: resource.email,
@@ -51,9 +51,9 @@ class InvitationsController < Devise::InvitationsController
       # Iniciamos sesión automáticamente al usuario
       # devise-jwt agregará el token JWT en los headers de respuesta
       sign_in(resource)
-      
+
       render json: {
-        message: 'Invitación aceptada exitosamente. Token JWT en el header Authorization.',
+        message: "Invitación aceptada exitosamente. Token JWT en el header Authorization.",
         user: {
           id: resource.id,
           email: resource.email,
@@ -91,4 +91,3 @@ class InvitationsController < Devise::InvitationsController
     nil
   end
 end
-
