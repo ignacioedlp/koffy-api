@@ -18,6 +18,9 @@ class User < ApplicationRecord
   # A user has many orders (as a customer)
   has_many :orders, dependent: :destroy
   
+  # A user has many reviews (reviews they've written)
+  has_many :reviews, dependent: :destroy
+  
   # Validations
   validates :email, presence: true, uniqueness: true
   validates :profile_picture_url, length: { maximum: 200 }, allow_blank: true
