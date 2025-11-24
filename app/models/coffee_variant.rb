@@ -3,6 +3,12 @@ class CoffeeVariant < ApplicationRecord
   
   belongs_to :coffee
   
+  # A coffee variant can be in many order items
+  has_many :order_items, dependent: :destroy
+  
+  # A coffee variant has many orders through order items
+  has_many :orders, through: :order_items
+  
   validates :grind_type, length: { maximum: 50 }, allow_blank: true
   
   validates :bag_size, length: { maximum: 20 }, allow_blank: true

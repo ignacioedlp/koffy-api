@@ -14,6 +14,10 @@ class User < ApplicationRecord
          lock_strategy: :failed_attempts, 
          unlock_strategy: :both
 
+  # Associations
+  # A user has many orders (as a customer)
+  has_many :orders, dependent: :destroy
+  
   # Validations
   validates :email, presence: true, uniqueness: true
   validates :profile_picture_url, length: { maximum: 200 }, allow_blank: true
