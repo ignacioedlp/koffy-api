@@ -1,3 +1,7 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
 cloudflare:
   service: S3
   endpoint: https://<%= ENV["R2_ACCOUNT_ID"] %>.r2.cloudflarestorage.com

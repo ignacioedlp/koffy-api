@@ -1,5 +1,5 @@
 # Dockerfile para desarrollo
-FROM ruby:3.1.2
+FROM ruby:3.3.2
 
 # Instalar dependencias del sistema
 RUN apt-get update -qq && \

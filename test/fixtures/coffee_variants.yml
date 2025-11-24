@@ -1,11 +1,20 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
+# CoffeeVariant fixtures
+# CoffeeVariants require a coffee_id (foreign key to coffees table)
+# If you need coffee_variants for your tests, uncomment and customize the fixtures below:
+# Make sure to reference a valid coffee fixture (e.g., coffees(:one))
 #
-one: {}
-# column: value
+# variant_one:
+#   coffee: one  # References coffees(:one)
+#   size: "250g"
+#   price: 15.99
+#   stock: 100
+#   is_active: true
 #
-two: {}
-# column: value
+# variant_two:
+#   coffee: one  # References coffees(:one)
+#   size: "500g"
+#   price: 28.99
+#   stock: 50
+#   is_active: true

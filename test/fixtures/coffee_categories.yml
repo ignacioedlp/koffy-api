@@ -1,11 +1,14 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
+# CoffeeCategory fixtures (join table between coffees and categories)
+# CoffeeCategories require both coffee_id and category_id (foreign keys)
+# If you need coffee_categories for your tests, uncomment and customize the fixtures below:
+# Make sure to reference valid coffee and category fixtures
 #
-one: {}
-# column: value
+# coffee_category_one:
+#   coffee: one  # References coffees(:one)
+#   category: one  # References categories(:one)
 #
-two: {}
-# column: value
+# coffee_category_two:
+#   coffee: one  # References coffees(:one)
+#   category: two  # References categories(:two)

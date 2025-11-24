@@ -1,26 +1,26 @@
 class User < ApplicationRecord
   # Include Ransackable concern for ActiveAdmin search functionality
   include Ransackable
-  
+
   # Include Roaster authorization methods
   include RoasterAuthorizable
-  
+
   # Include default devise modules. Others available are:
   # :timeoutable, :trackable and :omniauthable
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :lockable,
-         :confirmable, :jwt_authenticatable, 
+         :confirmable, :jwt_authenticatable,
          jwt_revocation_strategy: JwtDenylist,
-         lock_strategy: :failed_attempts, 
+         lock_strategy: :failed_attempts,
          unlock_strategy: :both
 
   # Associations
   # A user has many orders (as a customer)
   has_many :orders, dependent: :destroy
-  
+
   # A user has many reviews (reviews they've written)
   has_many :reviews, dependent: :destroy
-  
+
   # Validations
   validates :email, presence: true, uniqueness: true
   validates :profile_picture_url, length: { maximum: 200 }, allow_blank: true
@@ -30,16 +30,16 @@ class User < ApplicationRecord
 
   # Scopes
   # Scope to find users who are NOT members of any roaster (coffee lovers only)
-  scope :coffee_lovers_only, -> { 
+  scope :coffee_lovers_only, -> {
     left_outer_joins(:roaster_memberships)
       .where(roaster_memberships: { id: nil })
-      .distinct 
+      .distinct
   }
-  
+
   # Scope to find users who ARE members of at least one roaster
-  scope :roaster_members, -> { 
+  scope :roaster_members, -> {
     joins(:roaster_memberships)
-      .distinct 
+      .distinct
   }
 
   # Instance method to check if user is a coffee lover (not a member of any roaster)
@@ -51,17 +51,17 @@ class User < ApplicationRecord
   # Class method to find or create user from Google OAuth
   def self.from_google(email:, uid:, name:)
     user = User.find_by(email: email)
-    
+
     if user
       # Update user with Google info if not already set
-      user.update(provider: 'google', uid: uid, name: name) if user.provider.nil?
+      user.update(provider: "google", uid: uid, name: name) if user.provider.nil?
       user
     else
       # Create new user from Google OAuth
       # Google users are auto-confirmed since Google already verified their email
       User.create!(
         email: email,
-        provider: 'google',
+        provider: "google",
         uid: uid,
         name: name,
         password: Devise.friendly_token[0, 20],  # Generate random password

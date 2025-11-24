@@ -10,7 +10,7 @@ class CreateRoasters < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
-    
+
     # Index for faster queries on active roasters
     add_index :roasters, :active
     # Index for searching by name

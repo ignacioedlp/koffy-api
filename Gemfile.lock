@@ -152,6 +152,8 @@ GEM
       cgi (>= 0.3.3)
     erubi (1.13.1)
     ffi (1.17.2)
+    formadmin (0.2.1)
+      activeadmin
     formtastic (5.0.0)
       actionpack (>= 6.0.0)
     formtastic_i18n (0.7.0)
@@ -402,6 +404,7 @@ DEPENDENCIES
   devise
   devise-jwt
   devise_invitable (~> 2.0.0)
+  formadmin
   google-id-token
   image_processing (~> 1.2)
   inherited_resources
@@ -416,6 +419,9 @@ DEPENDENCIES
   sassc-rails
   sprockets-rails
   tzinfo-data
+
+RUBY VERSION
+   ruby 3.3.2p78
 
 BUNDLED WITH
    2.6.9

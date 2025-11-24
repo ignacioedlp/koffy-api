@@ -37,7 +37,7 @@ class ReviewPolicy < ApplicationPolicy
   # Only the user who created the review can update it
   def update?
     return false unless user.present?
-    
+
     # User must be the author of the review
     record.user_id == user.id
   end
@@ -45,9 +45,8 @@ class ReviewPolicy < ApplicationPolicy
   # Only the user who created the review can delete it
   def destroy?
     return false unless user.present?
-    
+
     # User must be the author of the review
     record.user_id == user.id
   end
 end
-

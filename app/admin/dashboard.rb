@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: proc { I18n.t("active_admin.dashboard") }
 
@@ -6,10 +7,10 @@ ActiveAdmin.register_page "Dashboard" do
     # Statistics summary cards at the top
     panel "Estadísticas Generales" do
       table_for [
-        ["Total Usuarios", User.count],
-        ["Total Roasters", Roaster.count],
-        ["Total Órdenes", Order.count],
-        ["Total Cafés", Coffee.count]
+        [ "Total Usuarios", User.count ],
+        [ "Total Roasters", Roaster.count ],
+        [ "Total Órdenes", Order.count ],
+        [ "Total Cafés", Coffee.count ]
       ] do
         column "Estadística" do |row|
           row[0]
@@ -37,7 +38,7 @@ ActiveAdmin.register_page "Dashboard" do
               user.created_at.strftime("%d/%m/%Y %H:%M")
             end
             column "Confirmado" do |user|
-              user.confirmed_at.present? ? status_tag("Sí", class: 'ok') : status_tag("No", class: 'warning')
+              user.confirmed_at.present? ? status_tag("Sí", class: "ok") : status_tag("No", class: "warning")
             end
           end
         end
@@ -50,7 +51,7 @@ ActiveAdmin.register_page "Dashboard" do
                                           .having("COUNT(reviews.id) > 0")
                                           .order("AVG(reviews.rating) DESC")
                                           .limit(10)
-          
+
           table_for top_roasters_by_rating do
             column "Roaster" do |roaster|
               link_to roaster.name, admin_roaster_path(roaster)
@@ -77,7 +78,7 @@ ActiveAdmin.register_page "Dashboard" do
               roaster.created_at.strftime("%d/%m/%Y %H:%M")
             end
             column "Activo" do |roaster|
-              roaster.active? ? status_tag("Sí", class: 'ok') : status_tag("No", class: 'error')
+              roaster.active? ? status_tag("Sí", class: "ok") : status_tag("No", class: "error")
             end
             column "Cafés" do |roaster|
               roaster.coffees.count
@@ -95,7 +96,7 @@ ActiveAdmin.register_page "Dashboard" do
                                           .select("roasters.*, COUNT(orders.id) as orders_count")
                                           .order("COUNT(orders.id) DESC")
                                           .limit(10)
-          
+
           table_for top_roasters_by_orders do
             column "Roaster" do |roaster|
               link_to roaster.name, admin_roaster_path(roaster)
@@ -116,16 +117,16 @@ ActiveAdmin.register_page "Dashboard" do
         panel "Top 5 Mejores Cafés (por Cantidad Vendida)" do
           top_coffees_data = Coffee.joins(coffee_variants: { order_items: :order })
                                    .joins(:roaster)
-                                   .where(orders: { status: ['confirmed', 'preparing', 'ready', 'completed'] })
+                                   .where(orders: { status: [ "confirmed", "preparing", "ready", "completed" ] })
                                    .group("coffees.id, coffees.name, coffees.roaster_id, roasters.name")
                                    .select("coffees.id, coffees.name, coffees.roaster_id, roasters.name as roaster_name, SUM(order_items.quantity) as total_sold")
                                    .order("SUM(order_items.quantity) DESC")
                                    .limit(5)
-          
+
           # Preload coffee variants to avoid N+1 queries
           coffee_ids = top_coffees_data.map(&:id)
           coffees_with_variants = Coffee.where(id: coffee_ids).includes(:coffee_variants).index_by(&:id)
-          
+
           table_for top_coffees_data do
             column "Café" do |coffee|
               link_to coffee.name, admin_coffee_path(coffee.id)
@@ -147,9 +148,9 @@ ActiveAdmin.register_page "Dashboard" do
             column "En Stock" do |coffee|
               coffee_obj = coffees_with_variants[coffee.id]
               if coffee_obj && coffee_obj.in_stock?
-                status_tag("Sí", class: 'ok')
+                status_tag("Sí", class: "ok")
               else
-                status_tag("No", class: 'error')
+                status_tag("No", class: "error")
               end
             end
           end
@@ -158,7 +159,7 @@ ActiveAdmin.register_page "Dashboard" do
         # Panel: Estadísticas de Órdenes por Estado
         panel "Órdenes por Estado" do
           order_stats = Order.group(:status).count
-          
+
           table_for order_stats.map { |status, count| { status: status, count: count } } do
             column "Estado" do |stat|
               stat[:status].capitalize
@@ -220,31 +221,31 @@ ActiveAdmin.register_page "Dashboard" do
       users_by_month = User.select(Arel.sql("DATE_TRUNC('month', created_at) as month, COUNT(*) as count"))
                            .group(date_trunc_sql)
                            .order(date_trunc_sql)
-                           .map { |u| [u.month.strftime("%Y-%m"), u.count] }
+                           .map { |u| [ u.month.strftime("%Y-%m"), u.count ] }
                            .to_h
-      
+
       # Group orders by month
       orders_by_month = Order.select(Arel.sql("DATE_TRUNC('month', created_at) as month, COUNT(*) as count"))
                              .group(date_trunc_sql)
                              .order(date_trunc_sql)
-                             .map { |o| [o.month.strftime("%Y-%m"), o.count] }
+                             .map { |o| [ o.month.strftime("%Y-%m"), o.count ] }
                              .to_h
-      
+
       # Top 5 roasters by orders
       top_roasters_data = Roaster.joins(:orders)
                                  .group("roasters.id, roasters.name")
                                  .select("roasters.name, COUNT(orders.id) as orders_count")
                                  .order("COUNT(orders.id) DESC")
                                  .limit(5)
-                                 .map { |r| [r.name, r.orders_count] }
+                                 .map { |r| [ r.name, r.orders_count ] }
                                  .to_h
-      
+
       # Reviews distribution by rating
       reviews_by_rating = Review.group(:rating)
                                 .order(:rating)
                                 .count
                                 .transform_keys { |k| k.to_f.to_s }
-      
+
       raw <<-JAVASCRIPT
         // Wait for Chart.js to load
         document.addEventListener('DOMContentLoaded', function() {

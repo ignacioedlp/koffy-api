@@ -57,65 +57,65 @@ end
 puts "\n☕ Creating Coffee Lovers (users without roaster memberships)..."
 
 coffee_lovers_data = [
-  { 
-    email: 'laura.coffee@gmail.com', 
-    name: 'Laura Jiménez', 
+  {
+    email: 'laura.coffee@gmail.com',
+    name: 'Laura Jiménez',
     password: 'password123',
     preferred_grind_method: 'French Press',
     preferred_roast_level: 'Medium',
     preferred_bag_size: '250g'
   },
-  { 
-    email: 'roberto.espresso@gmail.com', 
-    name: 'Roberto Díaz', 
+  {
+    email: 'roberto.espresso@gmail.com',
+    name: 'Roberto Díaz',
     password: 'password123',
     preferred_grind_method: 'Espresso',
     preferred_roast_level: 'Dark',
     preferred_bag_size: '500g'
   },
-  { 
-    email: 'camila.pour@gmail.com', 
-    name: 'Camila Morales', 
+  {
+    email: 'camila.pour@gmail.com',
+    name: 'Camila Morales',
     password: 'password123',
     preferred_grind_method: 'Pour Over',
     preferred_roast_level: 'Light',
     preferred_bag_size: '250g'
   },
-  { 
-    email: 'fernando.aeropress@gmail.com', 
-    name: 'Fernando Castro', 
+  {
+    email: 'fernando.aeropress@gmail.com',
+    name: 'Fernando Castro',
     password: 'password123',
     preferred_grind_method: 'AeroPress',
     preferred_roast_level: 'Medium-Light',
     preferred_bag_size: '500g'
   },
-  { 
-    email: 'isabel.coldbrew@gmail.com', 
-    name: 'Isabel Ruiz', 
+  {
+    email: 'isabel.coldbrew@gmail.com',
+    name: 'Isabel Ruiz',
     password: 'password123',
     preferred_grind_method: 'Cold Brew',
     preferred_roast_level: 'Medium-Dark',
     preferred_bag_size: '1kg'
   },
-  { 
-    email: 'daniel.moka@gmail.com', 
-    name: 'Daniel Ortiz', 
+  {
+    email: 'daniel.moka@gmail.com',
+    name: 'Daniel Ortiz',
     password: 'password123',
     preferred_grind_method: 'Moka Pot',
     preferred_roast_level: 'Dark',
     preferred_bag_size: '250g'
   },
-  { 
-    email: 'andrea.chemex@gmail.com', 
-    name: 'Andrea Sánchez', 
+  {
+    email: 'andrea.chemex@gmail.com',
+    name: 'Andrea Sánchez',
     password: 'password123',
     preferred_grind_method: 'Chemex',
     preferred_roast_level: 'Light',
     preferred_bag_size: '500g'
   },
-  { 
-    email: 'gabriel.turkish@gmail.com', 
-    name: 'Gabriel Medina', 
+  {
+    email: 'gabriel.turkish@gmail.com',
+    name: 'Gabriel Medina',
     password: 'password123',
     preferred_grind_method: 'Turkish',
     preferred_roast_level: 'Medium',
@@ -301,7 +301,7 @@ coffee1 = roasters[0].coffees.find_or_create_by!(name: 'Ethiopian Yirgacheffe') 
   c.featured = true
   c.is_active = true
 end
-coffee1.categories << [valle_cats[:single_origin], valle_cats[:limited]]
+coffee1.categories << [ valle_cats[:single_origin], valle_cats[:limited] ]
 coffee1.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 16.99; v.stock = 45 }
 coffee1.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '500g') { |v| v.price = 30.99; v.stock = 30 }
 coffee1.coffee_variants.find_or_create_by!(grind_type: 'Filter', bag_size: '250g') { |v| v.price = 16.99; v.stock = 25 }
@@ -317,7 +317,7 @@ coffee2 = roasters[0].coffees.find_or_create_by!(name: 'Colombian Supremo') do |
   c.featured = true
   c.is_active = true
 end
-coffee2.categories << [valle_cats[:single_origin]]
+coffee2.categories << [ valle_cats[:single_origin] ]
 coffee2.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 14.99; v.stock = 60 }
 coffee2.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '1kg') { |v| v.price = 52.99; v.stock = 20 }
 coffee2.coffee_variants.find_or_create_by!(grind_type: 'Espresso', bag_size: '250g') { |v| v.price = 14.99; v.stock = 40 }
@@ -334,7 +334,7 @@ coffee3 = roasters[0].coffees.find_or_create_by!(name: 'House Blend Valle') do |
   c.featured = false
   c.is_active = true
 end
-coffee3.categories << [valle_cats[:blends]]
+coffee3.categories << [ valle_cats[:blends] ]
 coffee3.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 12.99; v.stock = 80 }
 coffee3.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '500g') { |v| v.price = 23.99; v.stock = 50 }
 coffee3.coffee_variants.find_or_create_by!(grind_type: 'Filter', bag_size: '250g') { |v| v.price = 12.99; v.stock = 30 }
@@ -350,7 +350,7 @@ coffee4 = roasters[0].coffees.find_or_create_by!(name: 'Organic Peru') do |c|
   c.featured = false
   c.is_active = true
 end
-coffee4.categories << [valle_cats[:organic], valle_cats[:single_origin]]
+coffee4.categories << [ valle_cats[:organic], valle_cats[:single_origin] ]
 coffee4.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 15.49; v.stock = 40 }
 coffee4.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '500g') { |v| v.price = 28.99; v.stock = 25 }
 puts "      ✓ Organic Peru - 2 variants"
@@ -368,7 +368,7 @@ coffee5 = roasters[1].coffees.find_or_create_by!(name: 'Espresso Intenso') do |c
   c.featured = true
   c.is_active = true
 end
-coffee5.categories << [premium_cats[:espresso], premium_cats[:premium]]
+coffee5.categories << [ premium_cats[:espresso], premium_cats[:premium] ]
 coffee5.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 17.99; v.stock = 55 }
 coffee5.coffee_variants.find_or_create_by!(grind_type: 'Espresso', bag_size: '250g') { |v| v.price = 17.99; v.stock = 70 }
 coffee5.coffee_variants.find_or_create_by!(grind_type: 'Espresso', bag_size: '1kg') { |v| v.price = 64.99; v.stock = 15 }
@@ -384,7 +384,7 @@ coffee6 = roasters[1].coffees.find_or_create_by!(name: 'Kenya AA Nyeri') do |c|
   c.featured = true
   c.is_active = true
 end
-coffee6.categories << [premium_cats[:filter], premium_cats[:premium]]
+coffee6.categories << [ premium_cats[:filter], premium_cats[:premium] ]
 coffee6.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 21.99; v.stock = 30 }
 coffee6.coffee_variants.find_or_create_by!(grind_type: 'Filter', bag_size: '250g') { |v| v.price = 21.99; v.stock = 25 }
 puts "      ✓ Kenya AA Nyeri (Featured) - 2 variants"
@@ -399,7 +399,7 @@ coffee7 = roasters[1].coffees.find_or_create_by!(name: 'Decaf Swiss Water Colomb
   c.featured = false
   c.is_active = true
 end
-coffee7.categories << [premium_cats[:decaf]]
+coffee7.categories << [ premium_cats[:decaf] ]
 coffee7.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 16.99; v.stock = 35 }
 coffee7.coffee_variants.find_or_create_by!(grind_type: 'Filter', bag_size: '250g') { |v| v.price = 16.99; v.stock = 30 }
 coffee7.coffee_variants.find_or_create_by!(grind_type: 'Espresso', bag_size: '250g') { |v| v.price = 16.99; v.stock = 25 }
@@ -418,7 +418,7 @@ coffee8 = roasters[2].coffees.find_or_create_by!(name: 'Gesha Anaerobic Fermenta
   c.featured = true
   c.is_active = true
 end
-coffee8.categories << [aroma_cats[:experimental]]
+coffee8.categories << [ aroma_cats[:experimental] ]
 coffee8.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 45.99; v.stock = 12 }
 puts "      ✓ Gesha Anaerobic (Featured) - 1 variant"
 
@@ -432,7 +432,7 @@ coffee9 = roasters[2].coffees.find_or_create_by!(name: 'Brazil Natural Pulped') 
   c.featured = false
   c.is_active = true
 end
-coffee9.categories << [aroma_cats[:natural]]
+coffee9.categories << [ aroma_cats[:natural] ]
 coffee9.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 18.99; v.stock = 40 }
 coffee9.coffee_variants.find_or_create_by!(grind_type: 'Espresso', bag_size: '250g') { |v| v.price = 18.99; v.stock = 30 }
 puts "      ✓ Brazil Natural Pulped - 2 variants"
@@ -447,7 +447,7 @@ coffee10 = roasters[2].coffees.find_or_create_by!(name: 'Costa Rica Honey Black'
   c.featured = false
   c.is_active = true
 end
-coffee10.categories << [aroma_cats[:honey]]
+coffee10.categories << [ aroma_cats[:honey] ]
 coffee10.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 19.99; v.stock = 35 }
 puts "      ✓ Costa Rica Honey Black - 1 variant"
 
@@ -464,7 +464,7 @@ coffee11 = roasters[3].coffees.find_or_create_by!(name: 'Chiapas High Altitude')
   c.featured = true
   c.is_active = true
 end
-coffee11.categories << [mountain_cats[:light]]
+coffee11.categories << [ mountain_cats[:light] ]
 coffee11.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 15.99; v.stock = 50 }
 coffee11.coffee_variants.find_or_create_by!(grind_type: 'Filter', bag_size: '500g') { |v| v.price = 29.99; v.stock = 30 }
 puts "      ✓ Chiapas High Altitude (Featured) - 2 variants"
@@ -479,7 +479,7 @@ coffee12 = roasters[3].coffees.find_or_create_by!(name: 'Oaxaca Medium Roast') d
   c.featured = false
   c.is_active = true
 end
-coffee12.categories << [mountain_cats[:medium]]
+coffee12.categories << [ mountain_cats[:medium] ]
 coffee12.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 13.99; v.stock = 60 }
 coffee12.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '1kg') { |v| v.price = 49.99; v.stock = 20 }
 coffee12.coffee_variants.find_or_create_by!(grind_type: 'Espresso', bag_size: '250g') { |v| v.price = 13.99; v.stock = 45 }
@@ -495,7 +495,7 @@ coffee13 = roasters[3].coffees.find_or_create_by!(name: 'Dark Mountain Blend') d
   c.featured = false
   c.is_active = true
 end
-coffee13.categories << [mountain_cats[:dark]]
+coffee13.categories << [ mountain_cats[:dark] ]
 coffee13.coffee_variants.find_or_create_by!(grind_type: 'Whole Bean', bag_size: '250g') { |v| v.price = 14.99; v.stock = 45 }
 coffee13.coffee_variants.find_or_create_by!(grind_type: 'Espresso', bag_size: '500g') { |v| v.price = 27.99; v.stock = 30 }
 puts "      ✓ Dark Mountain Blend - 2 variants"

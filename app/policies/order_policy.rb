@@ -34,10 +34,10 @@ class OrderPolicy < ApplicationPolicy
   # 2. OR they are a member of the roaster assigned to the order
   def show?
     return false unless user.present?
-    
+
     # User is the customer
     return true if record.user_id == user.id
-    
+
     # User is a member of the roaster
     user.member_of?(record.roaster)
   end
@@ -52,7 +52,7 @@ class OrderPolicy < ApplicationPolicy
   # The user must have editing privileges (owner, manager, or barista)
   def update?
     return false unless user.present?
-    
+
     # User must be a member of the roaster with editing privileges
     user.can_edit?(record.roaster)
   end
@@ -60,9 +60,8 @@ class OrderPolicy < ApplicationPolicy
   # Only members of the roaster can destroy orders
   def destroy?
     return false unless user.present?
-    
+
     # Only owners and managers can delete orders
     user.can_manage?(record.roaster)
   end
 end
-
