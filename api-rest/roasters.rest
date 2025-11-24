@@ -9,7 +9,23 @@
 GET {{baseUrl}}/roasters
 Authorization: Bearer {{token}}
 
-### 2. Create a new roaster (user becomes owner automatically)
+### 2. Pagination - Get first page (default: 20 items per page)
+GET {{baseUrl}}/roasters?page=1
+Authorization: Bearer {{token}}
+
+### 3. Pagination - Get second page
+GET {{baseUrl}}/roasters?page=2
+Authorization: Bearer {{token}}
+
+### 4. Pagination - Custom items per page (10 items)
+GET {{baseUrl}}/roasters?page=1&per_page=10
+Authorization: Bearer {{token}}
+
+### 5. Pagination - Large page size (50 items)
+GET {{baseUrl}}/roasters?page=1&per_page=50
+Authorization: Bearer {{token}}
+
+### 6. Create a new roaster (user becomes owner automatically)
 POST {{baseUrl}}/roasters
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -23,11 +39,11 @@ Content-Type: application/json
   }
 }
 
-### 3. Get a specific roaster by ID
+### 7. Get a specific roaster by ID
 GET {{baseUrl}}/roasters/1
 Authorization: Bearer {{token}}
 
-### 4. Update a roaster (only owner or manager)
+### 8. Update a roaster (only owner or manager)
 PATCH {{baseUrl}}/roasters/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -40,15 +56,15 @@ Content-Type: application/json
   }
 }
 
-### 5. Delete a roaster (only owner)
+### 9. Delete a roaster (only owner)
 DELETE {{baseUrl}}/roasters/1
 Authorization: Bearer {{token}}
 
-### 6. Get all members of a roaster
+### 10. Get all members of a roaster
 GET {{baseUrl}}/roasters/1/members
 Authorization: Bearer {{token}}
 
-### 7. Add a member to a roaster with salary (only owner or manager)
+### 11. Add a member to a roaster with salary (only owner or manager)
 POST {{baseUrl}}/roasters/1/members
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -61,7 +77,7 @@ Content-Type: application/json
   "salary_period": "monthly"
 }
 
-### 8. Update a member's role and salary (only owner or manager)
+### 12. Update a member's role and salary (only owner or manager)
 PATCH {{baseUrl}}/roasters/1/members/2
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -73,7 +89,7 @@ Content-Type: application/json
   "salary_period": "monthly"
 }
 
-### 8b. Add hourly worker
+### 12b. Add hourly worker
 POST {{baseUrl}}/roasters/1/members
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -86,7 +102,7 @@ Content-Type: application/json
   "salary_period": "hourly"
 }
 
-### 8c. Add weekly paid worker
+### 12c. Add weekly paid worker
 POST {{baseUrl}}/roasters/1/members
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -99,10 +115,34 @@ Content-Type: application/json
   "salary_period": "weekly"
 }
 
-### 9. Remove a member from a roaster (only owner or manager)
+### 13. Remove a member from a roaster (only owner or manager)
 DELETE {{baseUrl}}/roasters/1/members/2
 Authorization: Bearer {{token}}
 
+###
+### Pagination:
+### The index endpoint supports pagination with the following query parameters:
+### - page: Page number (default: 1)
+### - per_page: Items per page (default: 20, maximum: 100)
+###
+### Example: GET /roasters?page=2&per_page=25
+###
+### Response includes pagination metadata:
+### {
+###   "data": [...],  // Array of roaster objects
+###   "meta": {
+###     "pagination": {
+###       "current_page": 1,      // Current page number
+###       "per_page": 20,          // Items per page
+###       "total_pages": 5,        // Total number of pages
+###       "total_count": 100,      // Total number of roasters
+###       "next_page": 2,          // Next page number (null if last page)
+###       "prev_page": null,       // Previous page number (null if first page)
+###       "first_page": true,      // Is this the first page?
+###       "last_page": false       // Is this the last page?
+###     }
+###   }
+### }
 ###
 ### Available Roles:
 ### - member: Basic member - can view roaster info

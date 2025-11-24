@@ -1,0 +1,135 @@
+<div id="title_bar">
+  <div id="titlebar_left">
+    <span class="breadcrumb">
+      <%= link_to "Admin", admin_root_path %>
+      <span class="breadcrumb_sep">/</span>
+      <%= link_to "Coffee Variants", admin_coffee_variants_path %>
+      <span class="breadcrumb_sep">/</span>
+      <%= link_to variant.full_name, admin_coffee_variant_path(variant) %>
+    </span>
+    <h2 id="page_title"><%= action == 'add' ? 'Add Stock' : 'Reduce Stock' %></h2>
+  </div>
+  <div id="titlebar_right"></div>
+</div>
+
+<div id="active_admin_content">
+  <div class="panel">
+    <h3>Current Variant Information</h3>
+    
+    <table class="attributes_table">
+      <tbody>
+        <tr>
+          <th>Coffee</th>
+          <td><%= variant.coffee.name %></td>
+        </tr>
+        <tr>
+          <th>Roaster</th>
+          <td><%= variant.coffee.roaster.name %></td>
+        </tr>
+        <tr>
+          <th>Grind Type</th>
+          <td><%= variant.grind_type || 'N/A' %></td>
+        </tr>
+        <tr>
+          <th>Bag Size</th>
+          <td><%= variant.bag_size || 'N/A' %></td>
+        </tr>
+        <tr>
+          <th>Current Stock</th>
+          <td><strong style="font-size: 18px; color: <%= variant.stock > 10 ? 'green' : (variant.stock > 0 ? 'orange' : 'red') %>"><%= variant.stock %> units</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel" style="margin-top: 20px;">
+    <h3><%= action == 'add' ? 'Add Stock' : 'Reduce Stock' %></h3>
+    
+    <%= form_tag update_stock_admin_coffee_variant_path(variant), method: :post do %>
+      <%= hidden_field_tag :action_type, action %>
+      
+      <fieldset class="inputs">
+        <ol>
+          <li class="numeric input required" id="quantity_input">
+            <label class="label" for="quantity">
+              Quantity <abbr title="required">*</abbr>
+            </label>
+            <%= number_field_tag :quantity, nil, 
+                  min: 1, 
+                  required: true,
+                  class: 'numeric',
+                  style: 'width: 200px; font-size: 16px;' %>
+            <p class="inline-hints">
+              <%= action == 'add' ? 'Number of units to add to stock' : 'Number of units to remove from stock' %>
+            </p>
+          </li>
+          
+          <% if action == 'add' %>
+            <li class="string" style="margin-top: 20px; padding: 15px; background-color: #e8f5e9; border-left: 4px solid #4caf50;">
+              <strong>New stock will be:</strong> 
+              <span id="new_stock" style="font-size: 18px; color: #2e7d32;">
+                <%= variant.stock %> units
+              </span>
+            </li>
+          <% else %>
+            <li class="string" style="margin-top: 20px; padding: 15px; background-color: #fff3e0; border-left: 4px solid #ff9800;">
+              <strong>New stock will be:</strong> 
+              <span id="new_stock" style="font-size: 18px; color: #e65100;">
+                <%= variant.stock %> units
+              </span>
+              <p style="margin-top: 10px; color: #666;">
+                Maximum you can reduce: <strong><%= variant.stock %> units</strong>
+              </p>
+            </li>
+          <% end %>
+        </ol>
+      </fieldset>
+
+      <fieldset class="actions">
+        <ol>
+          <li class="action input_action">
+            <%= submit_tag action == 'add' ? 'Add Stock' : 'Reduce Stock', 
+                  class: 'button', 
+                  style: 'font-size: 14px; padding: 10px 20px;' %>
+          </li>
+          <li class="cancel">
+            <%= link_to 'Cancel', admin_coffee_variant_path(variant) %>
+          </li>
+        </ol>
+      </fieldset>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  // JavaScript para calcular el nuevo stock en tiempo real
+  document.addEventListener('DOMContentLoaded', function() {
+    const quantityInput = document.getElementById('quantity');
+    const newStockSpan = document.getElementById('new_stock');
+    const currentStock = <%= variant.stock %>;
+    const action = '<%= action %>';
+    
+    quantityInput.addEventListener('input', function() {
+      const quantity = parseInt(this.value) || 0;
+      let newStock;
+      
+      if (action === 'add') {
+        newStock = currentStock + quantity;
+      } else {
+        newStock = Math.max(0, currentStock - quantity);
+      }
+      
+      newStockSpan.textContent = newStock + ' units';
+      
+      // Cambiar color según el nivel de stock
+      if (newStock > 10) {
+        newStockSpan.style.color = '#2e7d32'; // Verde
+      } else if (newStock > 0) {
+        newStockSpan.style.color = '#e65100'; // Naranja
+      } else {
+        newStockSpan.style.color = '#c62828'; // Rojo
+      }
+    });
+  });
+</script>
+

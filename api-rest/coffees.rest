@@ -1,0 +1,295 @@
+### Koffy API - Coffees Endpoints
+### Coffees can be created within roasters and viewed publicly
+### Make sure to replace {{token}} with your actual JWT token
+
+### Variables
+@baseUrl = http://localhost:3000
+@token = YOUR_JWT_TOKEN_HERE
+@roasterId = 9
+@coffeeId = 1
+@categoryId = 7
+
+### 1. Get all coffees (PUBLIC - shows active coffees from active roasters)
+GET {{baseUrl}}/coffees
+
+### 2. Get all coffees (authenticated - shows more details for members)
+GET {{baseUrl}}/coffees
+Authorization: Bearer {{token}}
+
+### 3. Get coffees filtered by roaster
+GET {{baseUrl}}/coffees?roaster_id={{roasterId}}
+Authorization: Bearer {{token}}
+
+### 4. Get coffees filtered by category
+GET {{baseUrl}}/coffees?category_id={{categoryId}}
+Authorization: Bearer {{token}}
+
+### 5. Get only featured coffees
+GET {{baseUrl}}/coffees?featured=true
+
+### 6. Get coffees by origin country
+GET {{baseUrl}}/coffees?country=Colombia
+Authorization: Bearer {{token}}
+
+### 7. Get coffees by roast level
+GET {{baseUrl}}/coffees?roast_level=medium
+Authorization: Bearer {{token}}
+
+### 8. Get coffees by process method
+GET {{baseUrl}}/coffees?process_method=washed
+Authorization: Bearer {{token}}
+
+### 9. Get coffees with variants included
+GET {{baseUrl}}/coffees?include_variants=true
+Authorization: Bearer {{token}}
+
+### 10. Complex filter - Colombian washed medium roast
+GET {{baseUrl}}/coffees?country=Colombia&process_method=washed&roast_level=medium
+Authorization: Bearer {{token}}
+
+### 11. Pagination - Get first page (default: 20 items per page)
+GET {{baseUrl}}/coffees?page=1
+Authorization: Bearer {{token}}
+
+### 12. Pagination - Get second page
+GET {{baseUrl}}/coffees?page=2
+Authorization: Bearer {{token}}
+
+### 13. Pagination - Custom items per page (10 items)
+GET {{baseUrl}}/coffees?page=1&per_page=10
+Authorization: Bearer {{token}}
+
+### 14. Pagination - Large page size (50 items)
+GET {{baseUrl}}/coffees?page=1&per_page=50
+Authorization: Bearer {{token}}
+
+### 15. Pagination with filters - Featured coffees, page 1, 15 per page
+GET {{baseUrl}}/coffees?featured=true&page=1&per_page=15
+Authorization: Bearer {{token}}
+
+### 16. Pagination with filters - Colombian coffees, page 2, 25 per page
+GET {{baseUrl}}/coffees?country=Colombia&page=2&per_page=25
+Authorization: Bearer {{token}}
+
+### 17. Pagination with multiple filters - Medium roast, page 1, 30 per page
+GET {{baseUrl}}/coffees?roast_level=medium&page=1&per_page=30
+Authorization: Bearer {{token}}
+
+### 18. Get a specific coffee by ID (PUBLIC)
+GET {{baseUrl}}/coffees/{{coffeeId}}
+
+### 19. Get a specific coffee with authentication (more details)
+GET {{baseUrl}}/coffees/{{coffeeId}}
+Authorization: Bearer {{token}}
+
+### 20. Get coffee without variants
+GET {{baseUrl}}/coffees/{{coffeeId}}?include_variants=false
+Authorization: Bearer {{token}}
+
+### 21. Create a new coffee (MEMBERS ONLY - requires edit privileges)
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee": {
+    "name": "Colombia Finca El Paraíso",
+    "description": "Un café excepcional de la región de Cauca, con notas brillantes de frutas tropicales y un dulzor natural que recuerda a la panela.",
+    "origin_country": "Colombia",
+    "varietal": "Castillo, Caturra",
+    "process_method": "washed",
+    "roast_level": "medium",
+    "flavor_notes": "Frutas tropicales, panela, cacao",
+    "is_active": true,
+    "featured": false,
+    "category_ids": [1, 2]
+  }
+}
+
+### 22. Create coffee - Ethiopian Natural
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee": {
+    "name": "Ethiopia Yirgacheffe",
+    "description": "Café etíope de proceso natural con perfil afrutado intenso y notas florales características de la región de Yirgacheffe.",
+    "origin_country": "Ethiopia",
+    "varietal": "Heirloom Ethiopian",
+    "process_method": "natural",
+    "roast_level": "light",
+    "flavor_notes": "Arándanos, jazmín, bergamota",
+    "is_active": true,
+    "featured": true,
+    "category_ids": [2]
+  }
+}
+
+### 23. Create coffee - Brazilian Honey Process
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee": {
+    "name": "Brazil Cerrado Honey",
+    "description": "Café brasileño con proceso honey que combina dulzor del natural con la limpieza del lavado. Ideal para espresso.",
+    "origin_country": "Brazil",
+    "varietal": "Bourbon, Catuaí",
+    "process_method": "honey",
+    "roast_level": "medium_dark",
+    "flavor_notes": "Chocolate con leche, nueces, caramelo",
+    "is_active": true,
+    "featured": false,
+    "category_ids": [1]
+  }
+}
+
+### 24. Create coffee - Decaf Swiss Water Process
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee": {
+    "name": "Decaf Colombian Swiss Water",
+    "description": "Café colombiano descafeinado mediante proceso Swiss Water, preservando todo el sabor sin cafeína.",
+    "origin_country": "Colombia",
+    "varietal": "Supremo",
+    "process_method": "washed",
+    "roast_level": "medium",
+    "flavor_notes": "Chocolate negro, almendras, dulce",
+    "is_active": true,
+    "featured": false,
+    "category_ids": [3]
+  }
+}
+
+### 25. Update a coffee (MEMBERS ONLY - requires edit privileges)
+PATCH {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee": {
+    "name": "Colombia Finca El Paraíso - Edición Especial",
+    "description": "Un café excepcional de la región de Cauca. Cosecha limitada 2024.",
+    "flavor_notes": "Frutas tropicales, panela, cacao, cítricos",
+    "featured": true
+  }
+}
+
+### 26. Mark coffee as featured
+PATCH {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee": {
+    "featured": true
+  }
+}
+
+### 27. Deactivate a coffee (keep it but hide from public)
+PATCH {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee": {
+    "is_active": false
+  }
+}
+
+### 28. Update coffee categories
+PATCH {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee": {
+    "category_ids": [1, 2, 3]
+  }
+}
+
+### 29. Delete a coffee (MEMBERS ONLY - requires management privileges)
+DELETE {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}
+Authorization: Bearer {{token}}
+
+###
+### Pagination:
+### The index endpoint supports pagination with the following query parameters:
+### - page: Page number (default: 1)
+### - per_page: Items per page (default: 20, maximum: 100)
+###
+### Example: GET /coffees?page=2&per_page=25
+###
+### Response includes pagination metadata:
+### {
+###   "data": [...],  // Array of coffee objects
+###   "meta": {
+###     "pagination": {
+###       "current_page": 1,      // Current page number
+###       "per_page": 20,          // Items per page
+###       "total_pages": 5,        // Total number of pages
+###       "total_count": 100,      // Total number of coffees
+###       "next_page": 2,          // Next page number (null if last page)
+###       "prev_page": null,       // Previous page number (null if first page)
+###       "first_page": true,      // Is this the first page?
+###       "last_page": false       // Is this the last page?
+###     }
+###   }
+### }
+###
+### Coffee Fields:
+### - name: String (required) - Name of the coffee
+### - description: Text - Detailed description
+### - origin_country: String - Country of origin (e.g., "Colombia", "Ethiopia")
+### - varietal: String - Coffee varieties (e.g., "Caturra, Castillo")
+### - process_method: String - Processing method
+### - roast_level: String - Roast level
+### - flavor_notes: String - Tasting notes
+### - image_url: String - URL to coffee image
+### - is_active: Boolean - Whether the coffee is visible to public
+### - featured: Boolean - Whether to highlight this coffee
+### - category_ids: Array - IDs of categories this coffee belongs to
+###
+
+### Process Methods:
+### - washed: Lavado (clean, bright acidity)
+### - natural: Natural/Seco (fruity, full body)
+### - honey: Honey/Miel (sweet, balanced)
+### - semi_washed: Semi-lavado
+### - wet_hulled: Wet-hulled/Giling Basah
+### - anaerobic: Fermentación anaeróbica
+
+### Roast Levels:
+### - light: Tueste claro (bright, acidic, complex)
+### - medium_light: Tueste medio-claro
+### - medium: Tueste medio (balanced)
+### - medium_dark: Tueste medio-oscuro
+### - dark: Tueste oscuro (bold, low acidity)
+
+### Common Origin Countries:
+### - Colombia, Ethiopia, Brazil, Costa Rica, Kenya, Guatemala,
+### - Honduras, Peru, Rwanda, Panama, Indonesia, Yemen, etc.
+
+### Permission Requirements:
+### Action                | Public | Member | Barista | Manager | Owner
+### ---------------------|--------|--------|---------|---------|-------
+### List coffees         |   ✓*   |   ✓    |    ✓    |    ✓    |   ✓
+### View coffee          |   ✓*   |   ✓    |    ✓    |    ✓    |   ✓
+### Create coffee        |   ✗    |   ✗    |    ✓    |    ✓    |   ✓
+### Update coffee        |   ✗    |   ✗    |    ✓    |    ✓    |   ✓
+### Delete coffee        |   ✗    |   ✗    |    ✗    |    ✓    |   ✓
+###
+### * Public users only see active coffees from active roasters
+### * Members see additional privileged information (costs, detailed stock, etc.)
+
+### Workflow Example:
+### 1. Create a roaster (see roasters.rest)
+### 2. Create categories for the roaster (see categories.rest)
+### 3. Create a coffee in the roaster (this file)
+### 4. Create variants for the coffee (see coffee_variants.rest)
+

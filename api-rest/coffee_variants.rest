@@ -1,0 +1,149 @@
+### Koffy API - Coffee Variants Endpoints
+### Coffee variants are scoped within roasters and coffees
+### Make sure to replace {{token}} with your actual JWT token
+
+### Variables
+@baseUrl = http://localhost:3000
+@token = YOUR_JWT_TOKEN_HERE
+@roasterId = 1
+@coffeeId = 1
+
+### 1. Create a coffee variant - Whole Bean, 250g
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}/variants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee_variant": {
+    "grind_type": "whole_bean",
+    "bag_size": "250g",
+    "price": 12.99,
+    "stock": 50
+  }
+}
+
+### 2. Create a coffee variant - Espresso Grind, 250g
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}/variants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee_variant": {
+    "grind_type": "espresso",
+    "bag_size": "250g",
+    "price": 12.99,
+    "stock": 30
+  }
+}
+
+### 3. Create a coffee variant - Filter Grind, 500g
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}/variants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee_variant": {
+    "grind_type": "filter",
+    "bag_size": "500g",
+    "price": 22.99,
+    "stock": 40
+  }
+}
+
+### 4. Create a coffee variant - French Press, 1kg
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}/variants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee_variant": {
+    "grind_type": "french_press",
+    "bag_size": "1kg",
+    "price": 42.99,
+    "stock": 20
+  }
+}
+
+### 5. Create a coffee variant - Cold Brew, 500g
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}/variants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee_variant": {
+    "grind_type": "cold_brew",
+    "bag_size": "500g",
+    "price": 24.99,
+    "stock": 25
+  }
+}
+
+### 6. Create a coffee variant - Turkish Grind, 250g
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}/variants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee_variant": {
+    "grind_type": "turkish",
+    "bag_size": "250g",
+    "price": 14.99,
+    "stock": 15
+  }
+}
+
+### 7. Create a coffee variant - Whole Bean, Sample Size (100g)
+POST {{baseUrl}}/roasters/{{roasterId}}/coffees/{{coffeeId}}/variants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "coffee_variant": {
+    "grind_type": "whole_bean",
+    "bag_size": "100g",
+    "price": 6.99,
+    "stock": 100
+  }
+}
+
+###
+### Coffee Variant Fields:
+### - grind_type: String (required) - Type of grind
+###   Options: whole_bean, espresso, filter, french_press, cold_brew, turkish, etc.
+### - bag_size: String (required) - Size of the bag
+###   Common sizes: 100g, 250g, 500g, 1kg
+### - price: Decimal (required) - Price for this specific variant
+### - stock: Integer (required) - Initial stock quantity
+###
+
+### Grind Types Reference:
+### - whole_bean: Granos enteros (sin moler)
+### - espresso: Molido fino para máquinas de espresso
+### - filter: Molido medio para cafeteras de filtro y pour-over
+### - french_press: Molido grueso para prensa francesa
+### - cold_brew: Molido extra grueso para preparación en frío
+### - turkish: Molido extra fino para café turco
+### - medium: Molido medio universal
+### - coarse: Molido grueso
+
+### Common Bag Sizes:
+### - 100g: Sample/Tasting size
+### - 250g: Standard home use
+### - 500g: Medium size for regular consumers
+### - 1kg: Bulk size for heavy users or commercial
+
+### Permission Requirements:
+### Action                | Public | Member | Barista | Manager | Owner
+### ---------------------|--------|--------|---------|---------|-------
+### Create variant       |   ✗    |   ✗    |    ✓    |    ✓    |   ✓
+###
+### Note: Only create is available for variants through this endpoint
+### Other operations (view, update, delete, stock management) require
+### direct access to the variant resource if implemented in the future
+
+### Important:
+### - Variants must belong to a coffee that belongs to the specified roaster
+### - You must have edit privileges (barista, manager, or owner) on the roaster
+### - Each variant is unique by the combination of coffee_id, grind_type, and bag_size
+### - Price can vary between different variants of the same coffee
+

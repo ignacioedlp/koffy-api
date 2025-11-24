@@ -1,4 +1,6 @@
 ActiveAdmin.register RoasterMembership do
+  menu parent: 'Roasters', priority: 2, label: 'Memberships'
+
   # Permit parameters for create/update
   permit_params :user_id, :roaster_id, :role, :active, :salary, :currency, :salary_period
   

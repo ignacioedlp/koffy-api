@@ -68,6 +68,66 @@ ActiveAdmin.register Roaster do
         end
       end
     end
+    
+    panel "Coffees" do
+      if roaster.coffees.any?
+        table_for roaster.coffees.order(created_at: :desc).limit(10) do
+          column "Coffee Name" do |coffee|
+            link_to coffee.name, admin_coffee_path(coffee)
+          end
+          column :origin_country
+          column :roast_level
+          column :is_active do |coffee|
+            status_tag coffee.is_active ? 'Active' : 'Inactive'
+          end
+          column :total_stock do |coffee|
+            coffee.total_stock
+          end
+        end
+        div style: "margin-top: 10px;" do
+          link_to "View All Coffees (#{roaster.coffees.count})", admin_coffees_path(q: { roaster_id_eq: roaster.id })
+        end
+      else
+        para "No coffees added yet."
+        div do
+          link_to "Add First Coffee", new_admin_coffee_path(coffee: { roaster_id: roaster.id }), class: 'button'
+        end
+      end
+    end
+    
+    panel "Categories" do
+      if roaster.categories.any?
+        table_for roaster.categories.order(position: :asc) do
+          column "Category Name" do |category|
+            link_to category.name, admin_category_path(category)
+          end
+          column :color do |category|
+            if category.color.present?
+              span style: "background-color: #{category.color}; padding: 5px 15px; color: white; border-radius: 4px;" do
+                category.color
+              end
+            else
+              'No color'
+            end
+          end
+          column :position
+          column :is_active do |category|
+            status_tag category.is_active ? 'Active' : 'Inactive'
+          end
+          column :coffees_count do |category|
+            category.coffees.count
+          end
+        end
+        div style: "margin-top: 10px;" do
+          link_to "View All Categories (#{roaster.categories.count})", admin_categories_path(q: { roaster_id_eq: roaster.id })
+        end
+      else
+        para "No categories created yet."
+        div do
+          link_to "Add First Category", new_admin_category_path(category: { roaster_id: roaster.id }), class: 'button'
+        end
+      end
+    end
   end
   
   # Form configuration
