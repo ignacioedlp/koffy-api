@@ -1,13 +1,17 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  location: MyString
-  description: MyText
-  active: false
+  name: Test Roaster One
+  location: Test City
+  description: A test roaster for testing purposes
+  active: true
+  average_rating: 4.5
+  delivery_available: true
 
 two:
-  name: MyString
-  location: MyString
-  description: MyText
-  active: false
+  name: Test Roaster Two
+  location: Another City
+  description: Another test roaster
+  active: true
+  average_rating: 4.0
+  delivery_available: false

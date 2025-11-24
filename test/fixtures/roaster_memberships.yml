@@ -1,13 +1,25 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user: one
-  roaster: one
-  role: MyString
-  active: false
-
-two:
-  user: two
-  roaster: two
-  role: MyString
-  active: false
+# RoasterMembership fixtures (join table between users and roasters)
+# RoasterMemberships require both user_id and roaster_id (foreign keys)
+# If you need roaster_memberships for your tests, uncomment and customize the fixtures below:
+# Make sure to reference valid user and roaster fixtures
+# Valid roles are: "owner", "manager", "barista", "member"
+#
+# membership_one:
+#   user: one  # References users(:one) - make sure this fixture exists
+#   roaster: one  # References roasters(:one)
+#   role: member
+#   active: true
+#   salary: 1000.00
+#   currency: USD
+#   salary_period: monthly
+#
+# membership_two:
+#   user: two  # References users(:two) - make sure this fixture exists
+#   roaster: one  # References roasters(:one)
+#   role: owner
+#   active: true
+#   salary: 2000.00
+#   currency: USD
+#   salary_period: monthly

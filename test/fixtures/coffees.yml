@@ -1,11 +1,22 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
+# Coffee fixtures
+# Coffees require a roaster_id (foreign key to roasters table)
+# If you need coffees for your tests, uncomment and customize the fixtures below:
+# Make sure to reference a valid roaster fixture (e.g., roasters(:one))
 #
-one: {}
-# column: value
+# coffee_one:
+#   roaster: one  # References roasters(:one)
+#   name: Colombian Supremo
+#   description: A smooth and balanced coffee
+#   origin: Colombia
+#   is_featured: true
+#   is_active: true
 #
-two: {}
-# column: value
+# coffee_two:
+#   roaster: one  # References roasters(:one)
+#   name: Ethiopian Yirgacheffe
+#   description: Bright and fruity with floral notes
+#   origin: Ethiopia
+#   is_featured: false
+#   is_active: true
