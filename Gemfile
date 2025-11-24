@@ -41,6 +41,9 @@ gem "google-id-token"
 # Authorization
 gem "pundit"  # Authorization policies
 
+# Pagination
+gem "kaminari"  # Pagination for API endpoints
+
 # Admin panel
 gem "activeadmin"
 

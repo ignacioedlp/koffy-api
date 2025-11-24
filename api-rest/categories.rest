@@ -1,0 +1,135 @@
+### Koffy API - Categories Endpoints
+### Categories are scoped within roasters
+### Make sure to replace {{token}} with your actual JWT token
+
+### Variables
+@baseUrl = http://localhost:3000
+@token = YOUR_JWT_TOKEN_HERE
+@roasterId = 1
+
+### 1. Get all categories for a roaster (PUBLIC - shows active for non-members)
+GET {{baseUrl}}/roasters/{{roasterId}}/categories
+Authorization: Bearer {{token}}
+
+### 2. Get all categories with coffees included
+GET {{baseUrl}}/roasters/{{roasterId}}/categories?include_coffees=true
+Authorization: Bearer {{token}}
+
+### 3. Get a specific category by ID (PUBLIC)
+GET {{baseUrl}}/roasters/{{roasterId}}/categories/1
+Authorization: Bearer {{token}}
+
+### 4. Get a specific category without coffees
+GET {{baseUrl}}/roasters/{{roasterId}}/categories/1?include_coffees=false
+Authorization: Bearer {{token}}
+
+### 5. Create a new category (MEMBERS ONLY - requires edit privileges)
+POST {{baseUrl}}/roasters/{{roasterId}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "category": {
+    "name": "Espresso Blends",
+    "description": "Mezclas perfectas para espresso con cuerpo y crema abundante",
+    "color": "#8B4513",
+    "icon": "coffee-cup",
+    "position": 1,
+    "is_active": true
+  }
+}
+
+### 6. Create another category example - Single Origin
+POST {{baseUrl}}/roasters/{{roasterId}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "category": {
+    "name": "Single Origin",
+    "description": "Cafés de origen único que destacan las características de cada región",
+    "color": "#6F4E37",
+    "icon": "location-pin",
+    "position": 2,
+    "is_active": true
+  }
+}
+
+### 7. Create category - Decaf
+POST {{baseUrl}}/roasters/{{roasterId}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "category": {
+    "name": "Decafeinados",
+    "description": "Cafés descafeinados sin comprometer el sabor",
+    "color": "#A0522D",
+    "icon": "moon",
+    "position": 3,
+    "is_active": true
+  }
+}
+
+### 8. Update a category (MEMBERS ONLY - requires edit privileges)
+PATCH {{baseUrl}}/roasters/{{roasterId}}/categories/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "category": {
+    "name": "Premium Espresso Blends",
+    "description": "Mezclas premium para espresso con notas de chocolate y caramelo",
+    "color": "#654321",
+    "position": 1
+  }
+}
+
+### 9. Deactivate a category (keep it but hide from public)
+PATCH {{baseUrl}}/roasters/{{roasterId}}/categories/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "category": {
+    "is_active": false
+  }
+}
+
+### 10. Reorder categories by changing position
+PATCH {{baseUrl}}/roasters/{{roasterId}}/categories/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "category": {
+    "position": 5
+  }
+}
+
+### 11. Delete a category (MEMBERS ONLY - requires management privileges)
+DELETE {{baseUrl}}/roasters/{{roasterId}}/categories/1
+Authorization: Bearer {{token}}
+
+###
+### Category Fields:
+### - name: String (required) - Name of the category
+### - description: Text - Detailed description
+### - color: String - Hex color code for UI theming
+### - icon: String - Icon identifier for the category
+### - position: Integer - Order in which categories are displayed
+### - is_active: Boolean - Whether the category is visible to public
+###
+
+### Permission Requirements:
+### Action                | Public | Member | Barista | Manager | Owner
+### ---------------------|--------|--------|---------|---------|-------
+### List categories      |   ✓*   |   ✓    |    ✓    |    ✓    |   ✓
+### View category        |   ✓*   |   ✓    |    ✓    |    ✓    |   ✓
+### Create category      |   ✗    |   ✗    |    ✓    |    ✓    |   ✓
+### Update category      |   ✗    |   ✗    |    ✓    |    ✓    |   ✓
+### Delete category      |   ✗    |   ✗    |    ✗    |    ✓    |   ✓
+###
+### * Public users only see active categories from active roasters
+### * Members see all categories including inactive ones from their roaster
+

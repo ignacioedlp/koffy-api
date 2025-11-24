@@ -6,11 +6,44 @@ class RoastersController < ApplicationController
   # List all active roasters (public catalog)
   # - Coffee lovers: See basic info (name, location, description) for browsing
   # - Members: See same list but with additional fields (user_role, is_member)
+  # 
+  # Query parameters:
+  # - page: Page number (default: 1)
+  # - per_page: Items per page (default: 20, max: 100)
   def index
     @roasters = policy_scope(Roaster)
-    render json: RoasterSerializer.new(@roasters, { 
+    
+    # Pagination
+    # Default: 20 items per page, maximum: 100 items per page
+    per_page = if params[:per_page].present?
+                  requested = params[:per_page].to_i
+                  requested > 0 ? [requested, 100].min : 20
+                else
+                  20
+                end
+    @roasters = @roasters.page(params[:page] || 1).per(per_page)
+    
+    # Serialize the paginated collection
+    serialized_data = RoasterSerializer.new(@roasters, { 
       params: { current_user: current_user } 
-    }).serializable_hash, status: :ok
+    }).serializable_hash
+    
+    # Add pagination metadata
+    render json: {
+      data: serialized_data[:data],
+      meta: {
+        pagination: {
+          current_page: @roasters.current_page,
+          per_page: @roasters.limit_value,
+          total_pages: @roasters.total_pages,
+          total_count: @roasters.total_count,
+          next_page: @roasters.next_page,
+          prev_page: @roasters.prev_page,
+          first_page: @roasters.first_page?,
+          last_page: @roasters.last_page?
+        }
+      }
+    }, status: :ok
   end
   
   # GET /roasters/:id

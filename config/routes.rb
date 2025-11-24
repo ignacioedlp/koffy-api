@@ -15,7 +15,14 @@ Rails.application.routes.draw do
   # Roasters routes
   resources :roasters do
     resources :members, only: [:index, :create, :update, :destroy], controller: 'roaster_members'
+    resources :coffees, only: [:create, :update, :destroy] do
+      resources :variants, only: [:create], controller: 'coffee_variants'
+    end
+    resources :categories, only: [:index, :show, :create, :update, :destroy]
   end
+  
+  # Coffees routes (public index and show only)
+  resources :coffees, only: [:index, :show]
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
