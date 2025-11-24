@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_23_224646) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_24_023522) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -24,6 +24,69 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_23_224646) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.bigint "roaster_id", null: false
+    t.string "name", limit: 50, null: false
+    t.text "description"
+    t.string "color", limit: 7
+    t.string "icon", limit: 50
+    t.boolean "is_active", default: true, null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_categories_on_is_active"
+    t.index ["position"], name: "index_categories_on_position"
+    t.index ["roaster_id", "name"], name: "index_categories_on_roaster_id_and_name", unique: true
+    t.index ["roaster_id"], name: "index_categories_on_roaster_id"
+  end
+
+  create_table "coffee_categories", force: :cascade do |t|
+    t.bigint "coffee_id", null: false
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_coffee_categories_on_category_id"
+    t.index ["coffee_id", "category_id"], name: "index_coffee_categories_on_coffee_id_and_category_id", unique: true
+    t.index ["coffee_id"], name: "index_coffee_categories_on_coffee_id"
+  end
+
+  create_table "coffee_variants", force: :cascade do |t|
+    t.bigint "coffee_id", null: false
+    t.string "grind_type", limit: 50
+    t.string "bag_size", limit: 20
+    t.decimal "price", precision: 10, scale: 2, null: false
+    t.integer "stock", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bag_size"], name: "index_coffee_variants_on_bag_size"
+    t.index ["coffee_id"], name: "index_coffee_variants_on_coffee_id"
+    t.index ["grind_type"], name: "index_coffee_variants_on_grind_type"
+    t.index ["price"], name: "index_coffee_variants_on_price"
+    t.index ["stock"], name: "index_coffee_variants_on_stock"
+  end
+
+  create_table "coffees", force: :cascade do |t|
+    t.bigint "roaster_id", null: false
+    t.string "name", limit: 100, null: false
+    t.text "description"
+    t.string "origin_country", limit: 100
+    t.string "varietal", limit: 100
+    t.string "process_method", limit: 50
+    t.string "roast_level", limit: 50
+    t.text "flavor_notes"
+    t.text "image_url"
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "featured", default: false, null: false
+    t.index ["featured"], name: "index_coffees_on_featured"
+    t.index ["is_active"], name: "index_coffees_on_is_active"
+    t.index ["name"], name: "index_coffees_on_name"
+    t.index ["origin_country"], name: "index_coffees_on_origin_country"
+    t.index ["roast_level"], name: "index_coffees_on_roast_level"
+    t.index ["roaster_id"], name: "index_coffees_on_roaster_id"
   end
 
   create_table "jwt_denylists", force: :cascade do |t|
@@ -109,6 +172,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_23_224646) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
 
+  add_foreign_key "categories", "roasters"
+  add_foreign_key "coffee_categories", "categories"
+  add_foreign_key "coffee_categories", "coffees"
+  add_foreign_key "coffee_variants", "coffees"
+  add_foreign_key "coffees", "roasters"
   add_foreign_key "roaster_memberships", "roasters"
   add_foreign_key "roaster_memberships", "users"
 end

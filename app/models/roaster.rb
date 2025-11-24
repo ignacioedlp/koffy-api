@@ -9,6 +9,12 @@ class Roaster < ApplicationRecord
   # A roaster has many users through memberships
   has_many :users, through: :roaster_memberships
   
+  # A roaster has many coffees (products)
+  has_many :coffees, dependent: :destroy
+  
+  # A roaster has many custom categories
+  has_many :categories, dependent: :destroy
+  
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
   validates :location, length: { maximum: 200 }, allow_blank: true
@@ -52,5 +58,30 @@ class Roaster < ApplicationRecord
   # Check if a user is a member of this roaster
   def has_member?(user)
     roaster_memberships.exists?(user: user, active: true)
+  end
+  
+  # Get featured coffees for this roaster
+  def featured_coffees
+    coffees.featured_active
+  end
+  
+  # Get active categories ordered by position
+  def active_categories
+    categories.active.by_position
+  end
+  
+  # Get coffees by category
+  def coffees_by_category(category)
+    coffees.active.in_category(category.id)
+  end
+  
+  # Count of active coffees
+  def active_coffees_count
+    coffees.active.count
+  end
+  
+  # Count of featured coffees
+  def featured_coffees_count
+    coffees.featured_active.count
   end
 end
