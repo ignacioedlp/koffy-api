@@ -24,6 +24,13 @@ Rails.application.routes.draw do
   # Coffees routes (public index and show only)
   resources :coffees, only: [:index, :show]
 
+  # Orders routes (authenticated users only)
+  resources :orders, only: [:index, :show, :create, :update] do
+    collection do
+      post 'scan_qr', to: 'orders#scan_qr'
+    end
+  end
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

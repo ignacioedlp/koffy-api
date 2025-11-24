@@ -61,6 +61,12 @@ class Order < ApplicationRecord
   # Scope to find orders by roaster
   scope :by_roaster, ->(roaster_id) { where(roaster_id: roaster_id) }
   
+  # Scope to find orders by QR code
+  scope :by_qr_code, ->(qr_code) { where(qr_code_data: qr_code) }
+  
+  # Callback to generate QR code before creating the order
+  before_create :generate_qr_code
+  
   # Instance methods
   
   # Calculate total amount from order items
@@ -118,6 +124,24 @@ class Order < ApplicationRecord
   after_update :handle_stock_on_status_change, if: :saved_change_to_status?
   
   private
+  
+  # Generate a unique QR code for the order
+  # This code will be used to scan and confirm the order when picking up/delivering
+  # Called automatically before creating the order (via before_create callback)
+  def generate_qr_code
+    # Generate a unique code using SecureRandom
+    # Format: ORDER-{timestamp}-{random_string}
+    # This ensures uniqueness and makes it easy to identify as an order code
+    loop do
+      timestamp = Time.now.to_i
+      random_string = SecureRandom.hex(8).upcase
+      self.qr_code_data = "ORDER-#{timestamp}-#{random_string}"
+      
+      # Ensure uniqueness by checking if code already exists
+      # Skip validation for new records to avoid querying the database
+      break unless Order.where(qr_code_data: self.qr_code_data).where.not(id: id).exists?
+    end
+  end
   
   def update_total_if_needed
     # Update total amount from order items if there are any items

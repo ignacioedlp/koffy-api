@@ -39,6 +39,12 @@ class User < ApplicationRecord
       .distinct 
   }
 
+  # Instance method to check if user is a coffee lover (not a member of any roaster)
+  # A coffee lover is a user who has no active roaster memberships
+  def coffee_lover?
+    active_roaster_memberships.empty?
+  end
+
   # Class method to find or create user from Google OAuth
   def self.from_google(email:, uid:, name:)
     user = User.find_by(email: email)
