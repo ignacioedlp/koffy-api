@@ -3,7 +3,6 @@ Rails.application.routes.draw do
   ActiveAdmin.routes(self)
   
   # Devise routes for users with custom invitations controller
-  # Usamos nuestro controlador personalizado para manejar invitaciones en formato JSON
   devise_for :users, controllers: {
     invitations: 'invitations'
   }
@@ -12,6 +11,11 @@ Rails.application.routes.draw do
   post 'auth/google', to: 'auth#google'
   post 'login', to: 'auth#login'
   delete 'logout', to: 'auth#logout'
+  
+  # Roasters routes
+  resources :roasters do
+    resources :members, only: [:index, :create, :update, :destroy], controller: 'roaster_members'
+  end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

@@ -8,6 +8,9 @@ gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
+
+# JSON Serialization
+gem "jsonapi-serializer"
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
 
@@ -34,6 +37,9 @@ gem "devise"
 gem "devise-jwt"
 gem "devise_invitable", "~> 2.0.0"  # Adds invitation functionality to Devise
 gem "google-id-token"
+
+# Authorization
+gem "pundit"  # Authorization policies
 
 # Admin panel
 gem "activeadmin"

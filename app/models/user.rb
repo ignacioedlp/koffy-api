@@ -2,6 +2,9 @@ class User < ApplicationRecord
   # Include Ransackable concern for ActiveAdmin search functionality
   include Ransackable
   
+  # Include Roaster authorization methods
+  include RoasterAuthorizable
+  
   # Include default devise modules. Others available are:
   # :timeoutable, :trackable and :omniauthable
   devise :invitable, :database_authenticatable, :registerable,
@@ -13,6 +16,24 @@ class User < ApplicationRecord
 
   # Validations
   validates :email, presence: true, uniqueness: true
+  validates :profile_picture_url, length: { maximum: 200 }, allow_blank: true
+  validates :preferred_grind_method, length: { maximum: 50 }, allow_blank: true
+  validates :preferred_roast_level, length: { maximum: 50 }, allow_blank: true
+  validates :preferred_bag_size, length: { maximum: 20 }, allow_blank: true
+
+  # Scopes
+  # Scope to find users who are NOT members of any roaster (coffee lovers only)
+  scope :coffee_lovers_only, -> { 
+    left_outer_joins(:roaster_memberships)
+      .where(roaster_memberships: { id: nil })
+      .distinct 
+  }
+  
+  # Scope to find users who ARE members of at least one roaster
+  scope :roaster_members, -> { 
+    joins(:roaster_memberships)
+      .distinct 
+  }
 
   # Class method to find or create user from Google OAuth
   def self.from_google(email:, uid:, name:)
