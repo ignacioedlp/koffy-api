@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_23_154317) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_23_224646) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -34,6 +34,42 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_23_154317) do
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
   end
 
+  create_table "roaster_memberships", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "roaster_id", null: false
+    t.string "role", default: "member", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "salary", precision: 10, scale: 2
+    t.string "currency", default: "USD", null: false
+    t.string "salary_period", default: "monthly", null: false
+    t.index ["active"], name: "index_roaster_memberships_on_active"
+    t.index ["roaster_id", "role"], name: "index_roaster_memberships_on_roaster_and_role"
+    t.index ["roaster_id", "role"], name: "index_roaster_memberships_on_roaster_id_and_role"
+    t.index ["roaster_id"], name: "index_roaster_memberships_on_roaster_id"
+    t.index ["salary"], name: "index_roaster_memberships_on_salary"
+    t.index ["salary_period"], name: "index_roaster_memberships_on_salary_period"
+    t.index ["user_id", "roaster_id"], name: "index_roaster_memberships_on_user_and_roaster", unique: true
+    t.index ["user_id", "roaster_id"], name: "index_roaster_memberships_on_user_id_and_roaster_id", unique: true
+    t.index ["user_id"], name: "index_roaster_memberships_on_user_id"
+  end
+
+  create_table "roasters", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "location"
+    t.text "description"
+    t.text "logo_url"
+    t.decimal "average_rating", default: "0.0", null: false
+    t.boolean "delivery_available", default: false, null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_roasters_on_active"
+    t.index ["delivery_available"], name: "index_roasters_on_delivery_available"
+    t.index ["name"], name: "index_roasters_on_name"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -50,6 +86,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_23_154317) do
     t.string "provider"
     t.string "uid"
     t.string "name"
+    t.text "profile_picture_url"
+    t.text "preferred_grind_method"
+    t.text "preferred_roast_level"
+    t.text "preferred_bag_size"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "invitation_token"
@@ -68,4 +108,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_23_154317) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
+
+  add_foreign_key "roaster_memberships", "roasters"
+  add_foreign_key "roaster_memberships", "users"
 end

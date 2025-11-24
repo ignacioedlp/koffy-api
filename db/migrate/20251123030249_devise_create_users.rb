@@ -37,6 +37,12 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
       t.string :uid                   # Google user ID
       t.string :name                  # User's full name
 
+      # Custom fields
+      t.text :profile_picture_url
+      t.text :preferred_grind_method
+      t.text :preferred_roast_level
+      t.text :preferred_bag_size
+
       t.timestamps null: false
     end
 

@@ -1,7 +1,12 @@
 ActiveAdmin.register User do
   # Specify the parameters that should be permitted for assignment
-  # Agregamos los parámetros de invitación
-  permit_params :email, :name, :password, :password_confirmation, :invitation_limit
+  permit_params :email, :name, :password, :password_confirmation, :invitation_limit, :preferred_grind_method, :preferred_roast_level, :preferred_bag_size
+
+  # Scopes for filtering users by type
+  # These appear as tabs at the top of the index page
+  scope :all, default: true
+  scope :coffee_lovers_only, label: "☕ Coffee Lovers Only"
+  scope :roaster_members, label: "🏪 Roaster Members"
 
   # Define the index page (list of users)
   index do
@@ -10,7 +15,7 @@ ActiveAdmin.register User do
     column :email
     column :name
     column :provider
-    # Columna de confirmación
+    # Confirmation status column
     column "Confirmation Status" do |user|
       if user.confirmed?
         status_tag("✓ Confirmed", class: 'ok')
@@ -18,7 +23,7 @@ ActiveAdmin.register User do
         status_tag("✗ Not Confirmed", class: 'error')
       end
     end
-    # Columnas de invitación
+    # Invitation status columns
     column "Invitation Status" do |user|
       if user.invitation_accepted_at
         status_tag("Accepted", class: 'ok')
@@ -34,11 +39,11 @@ ActiveAdmin.register User do
     end
     column :created_at
     actions do |user|
-      # Acción de confirmación
+      # Confirmation action
       unless user.confirmed?
         item "Confirm", confirm_admin_user_path(user), method: :put, class: "member_link"
       end
-      # Acción de bloqueo/desbloqueo
+      # Lock/unlock action
       if user.access_locked?
         item "Unlock", unlock_admin_user_path(user), method: :put, class: "member_link"
       else
@@ -57,6 +62,9 @@ ActiveAdmin.register User do
   filter :invitation_sent_at, label: "Invitation Sent"
   filter :invited_by_id, label: "Invited by (ID)"
   filter :created_at
+  filter :preferred_grind_method
+  filter :preferred_roast_level
+  filter :preferred_bag_size
 
   # Define the form for creating/editing users
   form do |f|
@@ -66,6 +74,9 @@ ActiveAdmin.register User do
       f.input :provider, as: :select, collection: ['google', 'email'], include_blank: true
       f.input :password
       f.input :password_confirmation
+      f.input :preferred_grind_method
+      f.input :preferred_roast_level
+      f.input :preferred_bag_size
     end
     f.actions
   end
@@ -93,11 +104,14 @@ ActiveAdmin.register User do
       row("Status") do |user|
         user.access_locked? ? status_tag("Locked", class: 'error') : status_tag("Active", class: 'ok')
       end
+      row :preferred_grind_method
+      row :preferred_roast_level
+      row :preferred_bag_size
       row :created_at
       row :updated_at
     end
     
-    # Panel de información de invitaciones
+    # Invitation information panel
     panel "Invitation Information" do
       attributes_table_for user do
         row("Invitation Status") do |u|
@@ -151,7 +165,7 @@ ActiveAdmin.register User do
     redirect_to admin_user_path(resource), notice: "User unlocked successfully"
   end
 
-  # Member action para confirmar manualmente un usuario
+  # Member action to manually confirm a user
   member_action :confirm, method: :put do
     if resource.confirmed?
       redirect_to admin_user_path(resource), alert: "User already confirmed"
@@ -161,7 +175,7 @@ ActiveAdmin.register User do
     end
   end
 
-  # Member action para reenviar email de confirmación
+  # Member action to resend confirmation email
   member_action :resend_confirmation, method: :put do
     if resource.confirmed?
       redirect_to admin_user_path(resource), alert: "User already confirmed"
@@ -171,15 +185,11 @@ ActiveAdmin.register User do
     end
   end
 
-  # Collection action para invitar nuevos usuarios
-  # Usamos GET porque necesitamos pasar el email como parámetro
+  # Collection action to invite new users
   collection_action :invite_new_user, method: :get do
     email = params[:email]
     
     if email.present?
-      # Intentamos invitar al usuario
-      # No pasamos inviter porque current_admin_user es AdminUser, no User
-      # Si necesitas rastrear quién invitó, usa la Opción 2 en los comentarios
       user = User.invite!({email: email})
       
       if user.errors.empty?
@@ -192,7 +202,7 @@ ActiveAdmin.register User do
     end
   end
   
-  # Agregar botón de invitar en la barra de acciones
+  # Add invite button to the actions bar
   action_item :invite, only: :index do
     link_to "Invite User", "#", class: "button", onclick: "var email = prompt('Enter the email of the user to invite:'); if(email) { window.location.href = '/admin/users/invite_new_user?email=' + email; } return false;"
   end

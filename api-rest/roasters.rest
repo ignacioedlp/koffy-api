@@ -1,0 +1,123 @@
+### Koffy API - Roasters Endpoints
+### Make sure to replace {{token}} with your actual JWT token
+
+### Variables
+@baseUrl = http://localhost:3000
+@token = YOUR_JWT_TOKEN_HERE
+
+### 1. Get all roasters (user must be a member)
+GET {{baseUrl}}/roasters
+Authorization: Bearer {{token}}
+
+### 2. Create a new roaster (user becomes owner automatically)
+POST {{baseUrl}}/roasters
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "roaster": {
+    "name": "Café del Valle",
+    "location": "Medellín, Colombia",
+    "description": "Tostador artesanal especializado en cafés de origen colombiano",
+    "active": true
+  }
+}
+
+### 3. Get a specific roaster by ID
+GET {{baseUrl}}/roasters/1
+Authorization: Bearer {{token}}
+
+### 4. Update a roaster (only owner or manager)
+PATCH {{baseUrl}}/roasters/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "roaster": {
+    "name": "Café del Valle Premium",
+    "location": "Medellín, Colombia",
+    "description": "Tostador artesanal especializado en cafés especiales de origen colombiano"
+  }
+}
+
+### 5. Delete a roaster (only owner)
+DELETE {{baseUrl}}/roasters/1
+Authorization: Bearer {{token}}
+
+### 6. Get all members of a roaster
+GET {{baseUrl}}/roasters/1/members
+Authorization: Bearer {{token}}
+
+### 7. Add a member to a roaster with salary (only owner or manager)
+POST {{baseUrl}}/roasters/1/members
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "user_id": 2,
+  "role": "barista",
+  "salary": 1500.00,
+  "currency": "USD",
+  "salary_period": "monthly"
+}
+
+### 8. Update a member's role and salary (only owner or manager)
+PATCH {{baseUrl}}/roasters/1/members/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "role": "manager",
+  "salary": 2500.00,
+  "currency": "USD",
+  "salary_period": "monthly"
+}
+
+### 8b. Add hourly worker
+POST {{baseUrl}}/roasters/1/members
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "user_id": 3,
+  "role": "barista",
+  "salary": 15.00,
+  "currency": "USD",
+  "salary_period": "hourly"
+}
+
+### 8c. Add weekly paid worker
+POST {{baseUrl}}/roasters/1/members
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "user_id": 4,
+  "role": "member",
+  "salary": 600.00,
+  "currency": "USD",
+  "salary_period": "weekly"
+}
+
+### 9. Remove a member from a roaster (only owner or manager)
+DELETE {{baseUrl}}/roasters/1/members/2
+Authorization: Bearer {{token}}
+
+###
+### Available Roles:
+### - member: Basic member - can view roaster info
+### - barista: Can manage inventory and production
+### - manager: Can manage operations and team
+### - owner: Full control over the roaster
+###
+
+### Permission Matrix:
+### Action                | Member | Barista | Manager | Owner
+### ---------------------|--------|---------|---------|-------
+### View roaster         |   ✓    |    ✓    |    ✓    |   ✓
+### Edit content         |   ✗    |    ✓    |    ✓    |   ✓
+### Update roaster       |   ✗    |    ✗    |    ✓    |   ✓
+### Invite members       |   ✗    |    ✗    |    ✓    |   ✓
+### Change roles         |   ✗    |    ✗    |    ✓    |   ✓
+### Delete roaster       |   ✗    |    ✗    |    ✗    |   ✓
+### Transfer ownership   |   ✗    |    ✗    |    ✗    |   ✓
