@@ -1,7 +1,4 @@
-class RoasterMembersController < ApplicationController
-  before_action :authenticate_user!
-  before_action :set_roaster
-
+class Api::Roaster::RoasterMembersController < Api::Roaster::RoasterController
   # GET /roasters/:roaster_id/members
   # List all members of a roaster
   def index
@@ -113,14 +110,5 @@ class RoasterMembersController < ApplicationController
     else
       render json: { errors: membership.errors.full_messages }, status: :unprocessable_entity
     end
-  end
-
-  private
-
-  # Find the roaster based on roaster_id parameter
-  def set_roaster
-    @roaster = Roaster.find(params[:roaster_id])
-  rescue ActiveRecord::RecordNotFound
-    render json: { error: "Roaster not found" }, status: :not_found
   end
 end

@@ -1,6 +1,17 @@
 ActiveAdmin.register Roaster do
+  controller do
+    def find_resource
+      begin
+        scoped_collection.where(slug: params[:id]).first!
+      rescue ActiveRecord::RecordNotFound
+        scoped_collection.find(params[:id])
+      end
+    end
+  end
+
   # Permit parameters for create/update
-  permit_params :name, :location, :description, :active, :delivery_available, :logo
+  permit_params :name, :location, :description, :active, :delivery_available, :logo, :image, :tags,
+                business_hours_attributes: [ :id, :day_of_week, :opens_at, :closes_at, :is_closed, :_destroy ]
 
   # Member action to remove logo
   member_action :remove_logo, method: :delete do
@@ -23,7 +34,15 @@ ActiveAdmin.register Roaster do
         "No logo"
       end
     end
+    column :image do |roaster|
+      if roaster.image.attached?
+        image_tag url_for(roaster.image), size: "80x80"
+      else
+        "No image"
+      end
+    end
     column :name
+    column :slug
     column :location
     column :active do |roaster|
       status_tag roaster.active ? "Active" : "Inactive", class: roaster.active ? "yes" : "no"
@@ -48,6 +67,7 @@ ActiveAdmin.register Roaster do
   filter :name
   filter :location
   filter :active
+  filter :slug
   filter :created_at
   filter :delivery_available
   filter :average_rating
@@ -57,6 +77,8 @@ ActiveAdmin.register Roaster do
     attributes_table do
       row :id
       row :name
+      row :slug
+      row :tags
       row :logo do |roaster|
         if roaster.logo.attached?
           image_tag url_for(roaster.logo), size: "150x150"
@@ -64,6 +86,14 @@ ActiveAdmin.register Roaster do
           "No logo"
         end
       end
+      row :image do |roaster|
+        if roaster.image.attached?
+          image_tag url_for(roaster.image), size: "150x150"
+        else
+          "No image"
+        end
+      end
+
       row :location
       row :description
       row :active do |roaster|
@@ -152,6 +182,30 @@ ActiveAdmin.register Roaster do
         end
       end
     end
+
+    panel "Business Hours" do
+      if roaster.business_hours.any?
+        table_for roaster.business_hours.ordered_by_day do
+          column "Day" do |business_hour|
+            business_hour.day_of_week.titleize
+          end
+          column :opens_at do |business_hour|
+            business_hour.opens_at&.strftime("%H:%M") || "-"
+          end
+          column :closes_at do |business_hour|
+            business_hour.closes_at&.strftime("%H:%M") || "-"
+          end
+          column :is_closed do |business_hour|
+            status_tag business_hour.is_closed ? "Closed" : "Open", class: business_hour.is_closed ? "error" : "ok"
+          end
+        end
+        div style: "margin-top: 10px;" do
+          para "Edit business hours in the form below."
+        end
+      else
+        para "No business hours configured yet. Add them in the form below."
+      end
+    end
   end
 
   # Form configuration
@@ -161,8 +215,11 @@ ActiveAdmin.register Roaster do
       f.input :location
       f.input :description, as: :text
       f.input :active
+      f.input :slug
       f.input :delivery_available
+      f.input :tags, as: :text, hint: "Add tags separated by commas"
       f.input :logo, as: :file, hint: "Upload a logo for the roaster"
+      f.input :image, as: :file, hint: "Upload an image for the roaster"
 
       # Show current logo if editing
       if f.object.logo.attached?
@@ -180,6 +237,18 @@ ActiveAdmin.register Roaster do
         end
       end
     end
+
+    f.inputs "Business Hours" do
+      f.has_many :business_hours, allow_destroy: true, heading: false do |bh|
+        bh.input :day_of_week, as: :select,
+                 collection: BusinessHour.day_of_weeks.keys.map { |day| [ day.titleize, day ] },
+                 include_blank: "Select a day"
+        bh.input :is_closed, label: "Closed all day"
+        bh.input :opens_at, as: :time_picker, label: "Opens at"
+        bh.input :closes_at, as: :time_picker, label: "Closes at"
+      end
+    end
+
     f.actions
   end
 end

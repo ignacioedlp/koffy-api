@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_25_000003) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_13_020653) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -52,6 +52,35 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_000003) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "business_hours", force: :cascade do |t|
+    t.bigint "roaster_id", null: false
+    t.integer "day_of_week", null: false
+    t.time "opens_at"
+    t.time "closes_at"
+    t.boolean "is_closed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["roaster_id", "day_of_week"], name: "index_business_hours_on_roaster_id_and_day_of_week"
+    t.index ["roaster_id"], name: "index_business_hours_on_roaster_id"
+  end
+
+  create_table "cart_items", force: :cascade do |t|
+    t.bigint "cart_id", null: false
+    t.bigint "coffee_variant_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cart_id"], name: "index_cart_items_on_cart_id"
+    t.index ["coffee_variant_id"], name: "index_cart_items_on_coffee_variant_id"
+  end
+
+  create_table "carts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_carts_on_user_id"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -108,12 +137,25 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_000003) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "featured", default: false, null: false
+    t.string "slug"
     t.index ["featured"], name: "index_coffees_on_featured"
     t.index ["is_active"], name: "index_coffees_on_is_active"
     t.index ["name"], name: "index_coffees_on_name"
     t.index ["origin_country"], name: "index_coffees_on_origin_country"
     t.index ["roast_level"], name: "index_coffees_on_roast_level"
     t.index ["roaster_id"], name: "index_coffees_on_roaster_id"
+    t.index ["slug"], name: "index_coffees_on_slug", unique: true
+  end
+
+  create_table "favorites", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "favoritable_type", null: false
+    t.bigint "favoritable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["favoritable_type", "favoritable_id"], name: "index_favorites_on_favoritable"
+    t.index ["user_id", "favoritable_type", "favoritable_id"], name: "index_favorites_on_user_and_favoritable", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
   create_table "jwt_denylists", force: :cascade do |t|
@@ -162,6 +204,19 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_000003) do
     t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
+  create_table "roaster_applications", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "roaster_name", null: false
+    t.string "full_name", null: false
+    t.text "comment"
+    t.string "website_url"
+    t.string "phone_number"
+    t.string "type_of_business", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "roaster_memberships", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "roaster_id", null: false
@@ -192,9 +247,34 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_000003) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "slug"
+    t.text "tags"
     t.index ["active"], name: "index_roasters_on_active"
     t.index ["delivery_available"], name: "index_roasters_on_delivery_available"
     t.index ["name"], name: "index_roasters_on_name"
+    t.index ["slug"], name: "index_roasters_on_slug", unique: true
+  end
+
+  create_table "subscription_items", force: :cascade do |t|
+    t.bigint "subscription_id", null: false
+    t.bigint "coffee_variant_id", null: false
+    t.integer "quantity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["coffee_variant_id"], name: "index_subscription_items_on_coffee_variant_id"
+    t.index ["subscription_id"], name: "index_subscription_items_on_subscription_id"
+  end
+
+  create_table "subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "day_of_month"
+    t.boolean "active"
+    t.datetime "last_order_created_at"
+    t.string "name"
+    t.string "pickup_or_delivery", default: "delivery"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_subscriptions_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -238,11 +318,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_000003) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "business_hours", "roasters"
+  add_foreign_key "cart_items", "carts"
+  add_foreign_key "cart_items", "coffee_variants"
+  add_foreign_key "carts", "users"
   add_foreign_key "categories", "roasters"
   add_foreign_key "coffee_categories", "categories"
   add_foreign_key "coffee_categories", "coffees"
   add_foreign_key "coffee_variants", "coffees"
   add_foreign_key "coffees", "roasters"
+  add_foreign_key "favorites", "users"
   add_foreign_key "order_items", "coffee_variants"
   add_foreign_key "order_items", "orders"
   add_foreign_key "orders", "roasters"
@@ -251,4 +336,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_25_000003) do
   add_foreign_key "reviews", "users"
   add_foreign_key "roaster_memberships", "roasters"
   add_foreign_key "roaster_memberships", "users"
+  add_foreign_key "subscription_items", "coffee_variants"
+  add_foreign_key "subscription_items", "subscriptions"
+  add_foreign_key "subscriptions", "users"
 end

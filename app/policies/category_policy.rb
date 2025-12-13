@@ -3,27 +3,13 @@
 class CategoryPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user
-        scope.joins(:roaster)
-             .where(
-               "(categories.is_active = ? AND roasters.active = ?) OR
-                roasters.id IN (?)",
-               true,
-               true,
-               user.roasters.pluck(:id)
-             )
-      else
-        # Non-authenticated users can only see active categories from active roasters
-        scope.joins(:roaster)
-             .where(categories: { is_active: true }, roasters: { active: true })
-      end
+      return scope.none unless user
+      scope.where(roaster_id: user.roaster.id)
     end
   end
 
-  # Anyone can view the index (list of categories)
-  # This allows coffee lovers to browse and filter by categories
   def index?
-    true
+    user && user.member_of?(record)
   end
 
   # Any user can view a category's public information

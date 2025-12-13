@@ -1,4 +1,4 @@
-class CoffeesController < ApplicationController
+class Api::CoffeesController < Api::ApiController
   # Authenticate user for all actions except index and show (public browsing)
   before_action :authenticate_user!, except: [ :index, :show ]
   before_action :set_roaster, only: [ :create, :update, :destroy ]
@@ -23,15 +23,17 @@ class CoffeesController < ApplicationController
     @coffees = policy_scope(Coffee)
 
     # Apply filters
-    @coffees = @coffees.where(roaster_id: params[:roaster_id]) if params[:roaster_id].present?
+    @coffees = @coffees.where("coffees.name ILIKE ?", "%#{params[:name]}%") if params[:name].present?
+    @coffees = @coffees.where(coffees: { roaster_id: params[:roaster_id] }) if params[:roaster_id].present?
     @coffees = @coffees.in_category(params[:category_id]) if params[:category_id].present?
     @coffees = @coffees.featured if params[:featured] == "true"
     @coffees = @coffees.from_country(params[:country]) if params[:country].present?
     @coffees = @coffees.roast_level_filter(params[:roast_level]) if params[:roast_level].present?
     @coffees = @coffees.process_method_filter(params[:process_method]) if params[:process_method].present?
 
+
     # Default ordering: featured first, then recent
-    @coffees = @coffees.order(featured: :desc, created_at: :desc)
+    @coffees = @coffees.order(featured: :desc, "coffees.created_at": :desc)
 
     # Pagination
     # Default: 20 items per page, maximum: 100 items per page
@@ -64,18 +66,20 @@ class CoffeesController < ApplicationController
           prev_page: @coffees.prev_page,
           first_page: @coffees.first_page?,
           last_page: @coffees.last_page?
-        }
+        },
+        filters: Rails.cache.fetch("coffees_index_filters", expires_in: 1.hour) do
+          {
+            roasters: Roaster.pluck(:id, :name).map { |id, name| { id: id, name: name } },
+            categories: Category.pluck(:id, :name).map { |id, name| { id: id, name: name } },
+            origin_countries: Coffee.distinct.pluck(:origin_country).compact,
+            roast_levels: Coffee.distinct.pluck(:roast_level).compact,
+            process_methods: Coffee.distinct.pluck(:process_method).compact
+          }
+        end
       }
     }, status: :ok
   end
 
-  # GET /coffees/:id
-  # Show details of a specific coffee (PUBLIC)
-  # - Public users: See public information only
-  # - Members: See public + privileged information (stock, costs, etc.)
-  #
-  # Query parameters:
-  # - include_variants: Include coffee variants in response (default: true for show)
   def show
     authorize @coffee
 
@@ -87,8 +91,6 @@ class CoffeesController < ApplicationController
     }).serializable_hash, status: :ok
   end
 
-  # POST /roasters/:roaster_id/coffees
-  # Create a new coffee (MEMBERS ONLY - requires edit privileges)
   def create
     @coffee = @roaster.coffees.build(coffee_params)
     authorize @coffee
@@ -105,8 +107,6 @@ class CoffeesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /roasters/:roaster_id/coffees/:id
-  # Update coffee details (MEMBERS ONLY - requires edit privileges)
   def update
     authorize @coffee
 
@@ -122,8 +122,6 @@ class CoffeesController < ApplicationController
     end
   end
 
-  # DELETE /roasters/:roaster_id/coffees/:id
-  # Delete a coffee (MEMBERS ONLY - requires management privileges)
   def destroy
     authorize @coffee
 
@@ -134,18 +132,17 @@ class CoffeesController < ApplicationController
   private
 
   def set_roaster
-    @roaster = Roaster.find(params[:roaster_id])
+    @roaster = Roaster.find_by!(slug: params[:roaster_slug])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Roaster not found" }, status: :not_found
   end
 
   def set_coffee
-    # If we have a roaster context (for update/destroy), scope to that roaster
-    if @roaster
-      @coffee = @roaster.coffees.find(params[:id])
+    if params[:roaster_slug].present?
+      set_roaster
+      @coffee = @roaster.coffees.find_by!(slug: params[:slug]) if @roaster
     else
-      # For show action (public), find globally
-      @coffee = Coffee.find(params[:id])
+      @coffee = Coffee.find_by!(slug: params[:slug])
     end
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Coffee not found" }, status: :not_found

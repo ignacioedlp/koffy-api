@@ -21,14 +21,34 @@ class Roaster < ApplicationRecord
   # A roaster has many reviews (reviews from users)
   has_many :reviews, dependent: :destroy
 
+  # A roaster has business hours (opening/closing times)
+  has_many :business_hours, dependent: :destroy
+
+  # Nested attributes for business hours
+  accepts_nested_attributes_for :business_hours, allow_destroy: true
+
+  # A roaster has many favorites
+  has_many :favorites, as: :favoritable, dependent: :destroy
+
   has_one_attached :logo
+  has_one_attached :image
 
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
+  validates :slug, presence: true, uniqueness: true
   validates :location, length: { maximum: 200 }, allow_blank: true
+
+  before_validation :generate_slug, if: -> { name.present? && (slug.blank? || name_changed?) }
   validates :description, length: { maximum: 1000 }, allow_blank: true
   validates :average_rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 5 }, allow_blank: true
   validates :delivery_available, inclusion: { in: [ true, false ] }
+
+  # Callbacks
+  after_create :create_default_business_hours
+
+  def to_param
+    slug
+  end
 
   # Scopes
   scope :active, -> { where(active: true) }
@@ -90,5 +110,36 @@ class Roaster < ApplicationRecord
   # Count of featured coffees
   def featured_coffees_count
     coffees.featured_active.count
+  end
+
+  def favorited_by?(user)
+    return false unless user
+    favorites.where(user: user)
+  end
+
+  private
+
+  def generate_slug
+    base_slug = name.parameterize
+    self.slug = base_slug
+    counter = 1
+    while Roaster.where(slug: slug).where.not(id: id).exists?
+      self.slug = "#{base_slug}-#{counter}"
+      counter += 1
+    end
+  end
+
+  def create_default_business_hours
+    # Create business hours for all 7 days of the week
+    # Default: Monday to Friday 9:00-18:00, weekends closed
+    # Only one time slot per day by default
+    BusinessHour.day_of_weeks.keys.each do |day|
+      business_hours.create!(
+        day_of_week: day,
+        is_closed: [ "saturday", "sunday" ].include?(day),
+        opens_at: [ "saturday", "sunday" ].include?(day) ? nil : "09:00",
+        closes_at: [ "saturday", "sunday" ].include?(day) ? nil : "18:00"
+      )
+    end
   end
 end

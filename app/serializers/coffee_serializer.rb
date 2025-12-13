@@ -5,7 +5,7 @@ class CoffeeSerializer
   # PUBLIC INFORMATION (all can see)
   # ========================================
   # Information that customers need to browse and choose coffees
-  attributes :id, :name, :description, :origin_country, :varietal,
+  attributes :id, :name, :slug, :description, :origin_country, :varietal,
              :process_method, :roast_level, :flavor_notes,
              :featured, :created_at, :updated_at
 
@@ -40,11 +40,36 @@ class CoffeeSerializer
   # Images URLs (public)
   attribute :images do |coffee|
     if coffee.images.attached?
-      coffee.images.map { |image| Rails.application.routes.url_helpers.url_for(image) }
+      coffee.images.map { |image| "#{ENV['R2_PUBLIC_URL']}/#{image.key}" }
     else
       []
     end
   end
+
+  attribute :is_favorite do |coffee, params|
+    if params && params[:current_user]
+      coffee.favorited_by?(params[:current_user])
+    else
+      false
+    end
+  end
+
+  attribute :is_favorite do |coffee, params|
+    if params && params[:current_user]
+      coffee.favorited_by?(params[:current_user]).exists?
+    else
+      false
+    end
+  end
+
+  attribute :favorite_id do |coffee, params|
+    if params && params[:current_user]
+      coffee.favorited_by?(params[:current_user]).first&.id
+    else
+      false
+    end
+  end
+
 
   # ========================================
   # PRIVILEGED INFORMATION (only roaster members)

@@ -5,14 +5,20 @@ class ReviewPolicy < ApplicationPolicy
   # Scope to filter reviews based on user permissions
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user.nil?
-        # Unauthenticated users can see all reviews (public information)
-        scope.all
-      else
-        # Authenticated users can see all reviews
-        # Reviews are public information
-        scope.all
-      end
+      # Todas las reviews públicas
+      scope.all
+    end
+  end
+
+  # Scope para reviews de un roaster específico
+  class RoasterScope < ApplicationPolicy::Scope
+    def initialize(user, scope, roaster)
+      super(user, scope)
+      @roaster = roaster
+    end
+
+    def resolve
+      scope.where(roaster_id: @roaster.id)
     end
   end
 

@@ -6,8 +6,17 @@ class CoffeeVariant < ApplicationRecord
   # A coffee variant can be in many order items
   has_many :order_items, dependent: :destroy
 
+  # A coffee variant can be in many cart items
+  has_many :cart_items, dependent: :destroy
+
   # A coffee variant has many orders through order items
   has_many :orders, through: :order_items
+
+  # A coffee variant has many subscriptions
+  has_many :subscriptions, dependent: :destroy
+
+  # A coffee variant has many favorites
+  has_many :favorites, as: :favoritable, dependent: :destroy
 
   validates :grind_type, length: { maximum: 50 }, allow_blank: true
 

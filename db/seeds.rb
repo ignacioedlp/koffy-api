@@ -145,22 +145,26 @@ roasters_data = [
   {
     name: 'Café del Valle',
     location: 'Medellín, Colombia',
-    description: 'Tostador artesanal especializado en cafés de origen colombiano con procesos sostenibles.'
+    description: 'Tostador artesanal especializado en cafés de origen colombiano con procesos sostenibles.',
+    tags: 'artesanal, colombiano, sostenible'
   },
   {
     name: 'Tostadores Premium',
     location: 'Bogotá, Colombia',
-    description: 'Especialistas en tueste medio y alto para cafés especiales de exportación.'
+    description: 'Especialistas en tueste medio y alto para cafés especiales de exportación.',
+    tags: 'tueste medio, tueste alto, cafés especiales'
   },
   {
     name: 'Aroma Coffee Roasters',
     location: 'Buenos Aires, Argentina',
-    description: 'Tostadores boutique enfocados en micro-lotes y cafés experimentales.'
+    description: 'Tostadores boutique enfocados en micro-lotes y cafés experimentales.',
+    tags: 'boutique, micro lotes, experimentales'
   },
   {
     name: 'Mountain Brew Co.',
     location: 'Ciudad de México, México',
-    description: 'Tostadores de altura especialistas en cafés de Chiapas y Oaxaca.'
+    description: 'Tostadores de altura especialistas en cafés de Chiapas y Oaxaca.',
+    tags: 'altura, Chiapas, Oaxaca'
   }
 ]
 
@@ -169,6 +173,7 @@ roasters = roasters_data.map do |roaster_data|
     r.location = roaster_data[:location]
     r.description = roaster_data[:description]
     r.active = true
+    r.tags = roaster_data[:tags]
   end
   puts "   ✓ Roaster created: #{roaster.name}"
   roaster

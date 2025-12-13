@@ -6,20 +6,26 @@ class OrderPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user.nil?
-        # Unauthenticated users cannot see any orders
         scope.none
-      elsif user.coffee_lover?
-        # Coffee lovers can only see their own orders
-        scope.where(user_id: user.id)
       else
-        # Roaster members can see:
-        # 1. Orders they placed as customers (their own orders)
-        # 2. Orders for roasters they are members of
-        scope.where(
-          "user_id = ? OR roaster_id IN (?)",
-          user.id,
-          user.active_roasters.pluck(:id)
-        )
+        # Por defecto, solo órdenes propias
+        scope.where(user_id: user.id)
+      end
+    end
+  end
+
+  # Scope para miembros de roaster (usado solo en el endpoint de roaster)
+  class RoasterScope < ApplicationPolicy::Scope
+    def resolve
+      if user.nil?
+        scope.none
+      else
+        roaster_ids = user.active_roasters.pluck(:id)
+        if roaster_ids.empty?
+          scope.where(user_id: user.id)
+        else
+          scope.where("user_id = ? OR roaster_id IN (?)", user.id, roaster_ids)
+        end
       end
     end
   end
@@ -48,10 +54,14 @@ class OrderPolicy < ApplicationPolicy
     user.present? && user.coffee_lover?
   end
 
-  # Only members of the roaster assigned to the order can update it
-  # The user must have editing privileges (owner, manager, or barista)
+  # Users can update an order if:
+  # 1. They are the customer AND the order is pending
+  # 2. OR they are a member of the roaster with editing privileges
   def update?
     return false unless user.present?
+
+    # Customer can edit their own order if it's pending
+    return true if record.user_id == user.id && record.status == "pending"
 
     # User must be a member of the roaster with editing privileges
     user.can_edit?(record.roaster)

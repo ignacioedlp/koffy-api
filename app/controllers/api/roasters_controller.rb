@@ -1,5 +1,5 @@
-class RoastersController < ApplicationController
-  before_action :authenticate_user!
+class Api::RoastersController < Api::ApiController
+  before_action :authenticate_user!, except: [ :index, :show ]
   before_action :set_roaster, only: [ :show, :update, :destroy ]
 
   # GET /roasters
@@ -10,8 +10,14 @@ class RoastersController < ApplicationController
   # Query parameters:
   # - page: Page number (default: 1)
   # - per_page: Items per page (default: 20, max: 100)
+  # - name: Filter by name (partial match, case-insensitive)
+  # - location: Filter by location (partial match, case-insensitive)
   def index
     @roasters = policy_scope(Roaster)
+
+    # Filtering
+    @roasters = @roasters.where("name ILIKE ?", "%#{params[:name]}%") if params[:name].present?
+    @roasters = @roasters.where("location ILIKE ?", "%#{params[:location]}%") if params[:location].present?
 
     # Pagination
     # Default: 20 items per page, maximum: 100 items per page
@@ -41,7 +47,12 @@ class RoastersController < ApplicationController
           prev_page: @roasters.prev_page,
           first_page: @roasters.first_page?,
           last_page: @roasters.last_page?
-        }
+        },
+        filters: Rails.cache.fetch("roasters_index_filters", expires_in: 1.hour) do
+          {
+            locations: Roaster.distinct.pluck(:location).compact.sort
+          }
+        end
       }
     }, status: :ok
   end
@@ -54,7 +65,7 @@ class RoastersController < ApplicationController
     authorize @roaster
 
     render json: RoasterSerializer.new(@roaster, {
-      params: { current_user: current_user, include_members: true }
+      params: { current_user: current_user, include_members: true, include_coffees_feature: true }
     }).serializable_hash, status: :ok
   end
 
@@ -108,12 +119,12 @@ class RoastersController < ApplicationController
   private
 
   def set_roaster
-    @roaster = Roaster.find(params[:id])
+    @roaster = Roaster.find_by!(slug: params[:slug])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Roaster not found" }, status: :not_found
   end
 
   def roaster_params
-    params.require(:roaster).permit(:name, :location, :description, :active, :logo)
+    params.require(:roaster).permit(:name, :location, :description, :active, :logo, tag_ids: [])
   end
 end

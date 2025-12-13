@@ -76,4 +76,12 @@ class RoasterPolicy < ApplicationPolicy
   def view_members?
     user.member_of?(record)
   end
+
+  def view_coffees?
+    user.member_of?(record)
+  end
+
+  def view_orders?
+    user.member_of?(record)
+  end
 end

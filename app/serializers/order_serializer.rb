@@ -6,7 +6,6 @@ class OrderSerializer
   # ========================================
   # Basic order information visible to customers and roaster members
   attributes :id, :status, :total_amount, :pickup_or_delivery,
-             :delivery_address, :pickup_time, :notes,
              :qr_code_data, :created_at, :updated_at
 
   # Customer information (visible to roaster members)
@@ -38,7 +37,8 @@ class OrderSerializer
         id: item.id,
         coffee_variant_id: item.coffee_variant_id,
         coffee_name: item.coffee_variant.coffee.name,
-        variant_name: item.coffee_variant.name,
+        variant_grind_type: item.coffee_variant.grind_type,
+        variant_bag_size: item.coffee_variant.bag_size,
         quantity: item.quantity,
         unit_price: item.unit_price,
         subtotal: item.subtotal
@@ -54,13 +54,6 @@ class OrderSerializer
   # ========================================
   # PRIVILEGED INFORMATION (only roaster members)
   # ========================================
-
-  # Additional customer information (only for roaster members)
-  attribute :customer_phone, if: Proc.new { |order, params|
-    params && params[:current_user] && params[:current_user].member_of?(order.roaster)
-  } do |order|
-    order.user.phone
-  end
 
   # Internal notes or special instructions (only for roaster members)
   attribute :internal_notes, if: Proc.new { |order, params|

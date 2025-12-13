@@ -18,8 +18,23 @@ class User < ApplicationRecord
   # A user has many orders (as a customer)
   has_many :orders, dependent: :destroy
 
+  # A user has one cart
+  has_one :cart, dependent: :destroy
+
+  # A user has many subscriptions
+  has_many :subscriptions, dependent: :destroy
+
   # A user has many reviews (reviews they've written)
   has_many :reviews, dependent: :destroy
+
+  has_one :roaster_membership, dependent: :destroy
+  has_one :roaster, through: :roaster_membership
+
+  # A user has many favorites
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_coffees, through: :favorites, source: :favoritable, source_type: "Coffee"
+  has_many :favorite_roasters, through: :favorites, source: :favoritable, source_type: "Roaster"
+  has_many :favorite_coffee_variants, through: :favorites, source: :favoritable, source_type: "CoffeeVariant"
 
   # Validations
   validates :email, presence: true, uniqueness: true

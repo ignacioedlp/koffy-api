@@ -1,7 +1,6 @@
-class OrdersController < ApplicationController
+class Api::Roaster::OrdersController < Api::Roaster::RoasterController
   # Authenticate user for all actions (orders require authentication)
-  before_action :authenticate_user!
-  before_action :set_order, only: [ :show, :update ]
+  before_action :set_order, only: [ :show ]
 
   # GET /orders
   # List orders for the current user
@@ -9,15 +8,13 @@ class OrdersController < ApplicationController
   # - Roaster members: See their own orders + orders for roasters they belong to
   #
   # Query parameters:
-  # - roaster_id: Filter by roaster (for roaster members)
   # - status: Filter by order status
   # - page: Page number (default: 1)
   # - per_page: Items per page (default: 20, max: 100)
   def index
-    authorize Order
+    authorize @roaster, :view_orders?
 
-    # Use policy scope to filter orders based on user permissions
-    @orders = policy_scope(Order)
+    @orders = @roaster.orders
 
     # Apply filters
     @orders = @orders.where(roaster_id: params[:roaster_id]) if params[:roaster_id].present?
@@ -71,75 +68,6 @@ class OrdersController < ApplicationController
     }).serializable_hash, status: :ok
   end
 
-  # POST /orders
-  # Create a new order (ONLY COFFEE LOVERS)
-  # Expects JSON body with:
-  # {
-  #   "order": {
-  #     "roaster_id": 1,
-  #     "pickup_or_delivery": "pickup",
-  #     "delivery_address": "123 Main St",
-  #     "pickup_time": "2024-01-15T10:00:00Z",
-  #     "notes": "Please grind medium",
-  #     "order_items_attributes": [
-  #       {
-  #         "coffee_variant_id": 1,
-  #         "quantity": 2,
-  #         "unit_price": 15.99
-  #       }
-  #     ]
-  #   }
-  # }
-  def create
-    @order = current_user.orders.build(order_params)
-    authorize @order
-
-    # Set default status if not provided
-    @order.status ||= "pending"
-
-    if @order.save
-      # Calculate and update total amount
-      @order.update_total!
-
-      render json: {
-        message: "Order created successfully",
-        order: OrderSerializer.new(@order, {
-          params: { current_user: current_user }
-        }).serializable_hash[:data][:attributes]
-      }, status: :created
-    else
-      render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
-  # PATCH/PUT /orders/:id
-  # Update an order (ONLY ROASTER MEMBERS with editing privileges)
-  # Only members of the roaster assigned to the order can update it
-  # Expects JSON body with:
-  # {
-  #   "order": {
-  #     "status": "confirmed",
-  #     "notes": "Updated notes"
-  #   }
-  # }
-  def update
-    authorize @order
-
-    if @order.update(order_params)
-      # Recalculate total if order items changed
-      @order.update_total! if order_params[:order_items_attributes].present?
-
-      render json: {
-        message: "Order updated successfully",
-        order: OrderSerializer.new(@order, {
-          params: { current_user: current_user }
-        }).serializable_hash[:data][:attributes]
-      }, status: :ok
-    else
-      render json: { errors: @order.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
   # POST /orders/scan_qr
   # Confirm an order by scanning its QR code
   # Only roaster members with editing privileges can scan and confirm orders
@@ -190,7 +118,7 @@ class OrdersController < ApplicationController
   private
 
   def set_order
-    @order = Order.find(params[:id])
+    @order = @roaster.orders.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render json: { error: "Order not found" }, status: :not_found
   end
@@ -200,9 +128,6 @@ class OrdersController < ApplicationController
       :roaster_id,
       :status,
       :pickup_or_delivery,
-      :delivery_address,
-      :pickup_time,
-      :notes,
       order_items_attributes: [
         :id,
         :coffee_variant_id,

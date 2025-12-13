@@ -1,6 +1,16 @@
 ActiveAdmin.register Coffee do
   menu parent: "Roasters", priority: 2
 
+  controller do
+    def find_resource
+      begin
+        scoped_collection.where(slug: params[:id]).first!
+      rescue ActiveRecord::RecordNotFound
+        scoped_collection.find(params[:id])
+      end
+    end
+  end
+
   permit_params :roaster_id, :name, :description, :origin_country, :varietal,
                 :process_method, :roast_level, :flavor_notes,
                 :is_active, :featured, images: [], category_ids: []

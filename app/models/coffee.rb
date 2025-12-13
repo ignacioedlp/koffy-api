@@ -11,9 +11,15 @@ class Coffee < ApplicationRecord
 
   has_many :categories, through: :coffee_categories
 
+  has_many :favorites, as: :favoritable, dependent: :destroy
+
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
 
+  validates :slug, presence: true, uniqueness: true
+
   validates :description, length: { maximum: 1000 }, allow_blank: true
+
+  before_validation :generate_slug, if: -> { name.present? && (slug.blank? || name_changed?) }
 
   validates :origin_country, length: { maximum: 100 }, allow_blank: true
 
@@ -36,17 +42,17 @@ class Coffee < ApplicationRecord
     end
   end
 
-  scope :active, -> { where(is_active: true) }
+  scope :active, -> { where(coffees: { is_active: true }) }
 
-  scope :inactive, -> { where(is_active: false) }
+  scope :inactive, -> { where(coffees: { is_active: false }) }
 
-  scope :featured, -> { where(featured: true) }
+  scope :featured, -> { where(coffees: { featured: true }) }
 
   scope :featured_active, -> { featured.active }
 
-  scope :by_name, -> { order(name: :asc) }
+  scope :by_name, -> { order("coffees.name": :asc) }
 
-  scope :recent, -> { order(created_at: :desc) }
+  scope :recent, -> { order("coffees.created_at": :desc) }
 
   scope :from_country, ->(country) { where(origin_country: country) }
 
@@ -55,6 +61,8 @@ class Coffee < ApplicationRecord
   scope :process_method_filter, ->(method) { where(process_method: method) }
 
   scope :in_category, ->(category_id) { joins(:categories).where(categories: { id: category_id }) }
+
+  scope :from_roaster_slug, ->(slug) { joins(:roaster).where(roasters: { slug: slug }) }
 
   def in_stock?
     coffee_variants.sum(:stock) > 0
@@ -86,5 +94,22 @@ class Coffee < ApplicationRecord
 
   def toggle_featured!
     update(featured: !featured)
+  end
+
+  def favorited_by?(user)
+    return false unless user
+    favorites.where(user: user)
+  end
+
+  private
+
+  def generate_slug
+    base_slug = name.parameterize
+    self.slug = base_slug
+    counter = 1
+    while Coffee.where(slug: slug).where.not(id: id).exists?
+      self.slug = "#{base_slug}-#{counter}"
+      counter += 1
+    end
   end
 end

@@ -1,4 +1,4 @@
-class ReviewsController < ApplicationController
+class Api::ReviewsController < Api::ApiController
   # Authenticate user for all actions except index and show (reviews are public)
   before_action :authenticate_user!, except: [ :index, :show ]
   before_action :set_review, only: [ :show, :update, :destroy ]
@@ -18,9 +18,14 @@ class ReviewsController < ApplicationController
     @reviews = policy_scope(Review)
 
     # Apply filters
-    # Handle nested route: /roasters/:roaster_id/reviews
-    # Rails automatically passes roaster_id from nested routes
-    @reviews = @reviews.where(roaster_id: params[:roaster_id]) if params[:roaster_id].present?
+    # Handle nested route: /roasters/:roaster_slug/reviews
+    if params[:roaster_slug].present?
+      roaster = Roaster.find_by(slug: params[:roaster_slug])
+      @reviews = @reviews.where(roaster_id: roaster.id) if roaster
+    elsif params[:roaster_id].present?
+      @reviews = @reviews.where(roaster_id: params[:roaster_id])
+    end
+
     @reviews = @reviews.where(user_id: params[:user_id]) if params[:user_id].present?
     @reviews = @reviews.min_rating(params[:min_rating]) if params[:min_rating].present?
 
@@ -57,6 +62,18 @@ class ReviewsController < ApplicationController
           last_page: @reviews.last_page?
         }
       }
+    }, status: :ok
+  end
+
+  # GET /reviews/:id
+  # Show a single review (public endpoint)
+  def show
+    authorize @review
+
+    render json: {
+      data: ReviewSerializer.new(@review, {
+        params: { current_user: current_user }
+      }).serializable_hash[:data]
     }, status: :ok
   end
 

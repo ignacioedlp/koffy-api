@@ -6,7 +6,68 @@ class RoasterSerializer
   # ========================================
   # Basic catalog public information
   # Coffee lovers can see this information to decide where to buy
-  attributes :id, :name, :location, :description, :active, :created_at, :updated_at
+  attributes :id, :name, :slug, :location, :description, :active, :created_at, :updated_at, :tags
+
+  attribute :coffees_count do |roaster|
+    roaster.coffees.active.count
+  end
+
+  # Logo URL
+  attribute :logo_url do |roaster|
+    if roaster.logo.attached?
+      "#{ENV['R2_PUBLIC_URL']}/#{roaster.logo.key}"
+    else
+      nil
+    end
+  end
+
+  attribute :image_url do |roaster|
+    if roaster.image.attached?
+      "#{ENV['R2_PUBLIC_URL']}/#{roaster.image.key}"
+    else
+      nil
+    end
+  end
+
+  # Business hours
+  attribute :business_hours do |roaster|
+    roaster.business_hours.ordered_by_day.map do |bh|
+      {
+        day_of_week: bh.day_of_week,
+        opens_at: bh.opens_at&.strftime("%H:%M"),
+        closes_at: bh.closes_at&.strftime("%H:%M"),
+        is_closed: bh.is_closed,
+        number_day_of_week: BusinessHour.day_of_weeks[bh.day_of_week]
+      }
+    end
+  end
+
+  attribute :feature_coffees, if: Proc.new { |roaster, params|
+    params &&
+    params[:include_coffees_feature] == true
+  } do |roaster, params|
+    roaster.coffees.featured_active.map do |coffee|
+      coffee_data = CoffeeSerializer.new(coffee, {
+        params: { current_user: params[:current_user], include_variants: true }
+      }).serializable_hash[:data][:attributes]
+    end
+  end
+
+  attribute :is_favorite do |roaster, params|
+    if params && params[:current_user]
+      roaster.favorited_by?(params[:current_user]).exists?
+    else
+      false
+    end
+  end
+
+  attribute :favorite_id do |roaster, params|
+    if params && params[:current_user]
+      roaster.favorited_by?(params[:current_user]).first&.id
+    else
+      false
+    end
+  end
 
   # ========================================
   # PRIVILEGED INFORMATION (only members)

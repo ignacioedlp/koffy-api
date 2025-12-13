@@ -3,20 +3,8 @@
 class CoffeeVariantPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
-      if user
-        scope.joins(coffee: :roaster)
-             .where(
-               "(coffees.is_active = ? AND roasters.active = ?) OR
-                roasters.id IN (?)",
-               true,
-               true,
-               user.roasters.pluck(:id)
-             )
-      else
-        # Non-authenticated users can only see variants from active coffees and active roasters
-        scope.joins(coffee: :roaster)
-             .where(coffees: { is_active: true }, roasters: { active: true })
-      end
+      return scope.none unless user
+      scope.joins(:coffee).where(coffees: { roaster_id: user.roaster.id })
     end
   end
 
