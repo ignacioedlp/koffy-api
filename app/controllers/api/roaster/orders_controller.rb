@@ -17,7 +17,6 @@ class Api::Roaster::OrdersController < Api::Roaster::RoasterController
     @orders = @roaster.orders
 
     # Apply filters
-    @orders = @orders.where(roaster_id: params[:roaster_id]) if params[:roaster_id].present?
     @orders = @orders.by_status(params[:status]) if params[:status].present?
 
     # Default ordering: most recent first

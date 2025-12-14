@@ -113,7 +113,7 @@ class Order < ApplicationRecord
   def total_quantity
     order_items.sum(:quantity)
   end
-
+  
   # Callback to update total amount after order items are saved
   after_save :update_total_if_needed
 

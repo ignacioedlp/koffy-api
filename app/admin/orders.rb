@@ -223,9 +223,11 @@ ActiveAdmin.register Order do
         end
 
         div style: "margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 4px;" do
-          strong "Total Amount: " +
-          span(number_to_currency(order.total_amount || order.calculate_total, unit: "$"),
-               style: "font-size: 1.2em; color: #2e7d32;")
+          safe_join([
+            strong("Total Amount: "),
+            span(number_to_currency(order.total_amount || order.calculate_total, unit: "$"),
+                 style: "font-size: 1.2em; color: #2e7d32;")
+          ])
         end
 
         div style: "margin-top: 10px;" do

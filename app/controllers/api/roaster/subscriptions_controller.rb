@@ -5,6 +5,7 @@ class Api::Roaster::SubscriptionsController < Api::Roaster::RoasterController
       .where(coffees: { roaster_id: @roaster.id })
       .distinct
       .includes(subscription_items: { coffee_variant: { coffee: :roaster } })
+      .order(day_of_month: :asc)
 
     render json: @subscriptions, include: {
       subscription_items: {

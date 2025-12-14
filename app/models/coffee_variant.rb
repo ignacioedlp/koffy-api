@@ -13,7 +13,8 @@ class CoffeeVariant < ApplicationRecord
   has_many :orders, through: :order_items
 
   # A coffee variant has many subscriptions
-  has_many :subscriptions, dependent: :destroy
+  has_many :subscription_items, dependent: :destroy
+  has_many :subscriptions, through: :subscription_items
 
   # A coffee variant has many favorites
   has_many :favorites, as: :favoritable, dependent: :destroy

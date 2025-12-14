@@ -512,6 +512,76 @@ puts "   • Featured Coffees: #{Coffee.featured.count}"
 puts "   • Total Variants: #{CoffeeVariant.count}"
 puts "   • Total Stock Units: #{CoffeeVariant.sum(:stock)}"
 
+# Generate a large number of Orders and Subscriptions per Roaster for development/testing
+puts "\n🧪 Generating many Orders and Subscriptions for each Roaster (development only)..."
+
+# use a pool of non-admin users as customers
+customers = User.where.not(email: 'admin@example.com').to_a
+
+Roaster.find_each do |roaster|
+  variants = roaster.coffees.includes(:coffee_variants).flat_map(&:coffee_variants)
+  next if variants.empty? || customers.empty?
+
+  orders_count = rand(80..150)
+  subscriptions_count = rand(30..80)
+
+  orders_count.times do
+    user = customers.sample
+    created_time = rand(1..180).days.ago + rand(0..86_399).seconds
+
+    order = Order.create!(
+      user: user,
+      roaster: roaster,
+      status: ['completed', 'confirmed', 'pending'].sample,
+      pickup_or_delivery: ['pickup', 'delivery'].sample,
+      created_at: created_time,
+      updated_at: created_time
+    )
+
+    rand(1..3).times do
+      variant = variants.sample
+      qty = [1, 1, 2].sample
+      order.order_items.create!(coffee_variant: variant, quantity: qty, unit_price: variant.price)
+    end
+
+    # ensure total_amount is consistent
+    order.update_total!
+
+    # If order is confirmed, decrement stock to simulate real sales
+    if order.status == 'confirmed'
+      order.order_items.each do |item|
+        v = item.coffee_variant
+        begin
+          v.reduce_stock(item.quantity) if v.stock.present? && v.stock >= item.quantity
+        rescue => e
+          Rails.logger.warn("Seed: couldn't reduce stock for variant #{v.id}: #{e.message}")
+        end
+      end
+    end
+  end
+
+  subscriptions_count.times do
+    user = customers.sample
+    created_time = rand(1..180).days.ago + rand(0..86_399).seconds
+
+    sub = Subscription.create!(
+      user: user,
+      day_of_month: rand(1..28),
+      active: [true, true, false].sample,
+      pickup_or_delivery: ['pickup', 'delivery'].sample,
+      created_at: created_time,
+      updated_at: created_time
+    )
+
+    rand(1..2).times do
+      variant = variants.sample
+      sub.subscription_items.create!(coffee_variant: variant, quantity: [1, 2].sample)
+    end
+  end
+
+  puts "   ✓ #{roaster.name}: created #{orders_count} orders, #{subscriptions_count} subscriptions"
+end
+
 # Create Roaster Memberships with different roles and salary types
 puts "\n💼 Creating Roaster Memberships..."
 

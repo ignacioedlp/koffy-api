@@ -26,6 +26,7 @@ Rails.application.routes.draw do
         end
       end
       resources :subscriptions, only: [ :index ]
+      resource :analytics, only: [ :show ], controller: "analytics"
     end
 
     # Coffees routes (public index and show only)
