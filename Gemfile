@@ -55,7 +55,7 @@ gem "inherited_resources"
 gem "sprockets-rails"
 gem "sassc-rails"
 
-gem "aws-sdk-s3", "~> 1.149"
+gem "aws-sdk-s3", "~> 1.213"
 
 
 group :development, :test do
